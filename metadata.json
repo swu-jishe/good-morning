@@ -1,0 +1,6 @@
+{
+  "name": "Goal Radar (目标雷达)",
+  "description": "大学生学业与升学信息聚合工作台。聚合多源信息，提供Agent化辅助提醒与排程功能。",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
