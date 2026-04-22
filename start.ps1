@@ -1,10 +1,10 @@
-# Goal Radar Demo - 本地启动脚本
+# 知途 Demo - 本地启动脚本
 # 用法: 右键此文件 → "使用 PowerShell 运行"，或在终端执行: .\start.ps1
 
 $ErrorActionPreference = "Stop"
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  Goal Radar Demo - 本地启动" -ForegroundColor Cyan
+Write-Host "  知途 Demo - 本地启动" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
@@ -46,7 +46,7 @@ if (-not (Test-Path "node_modules")) {
 
 Write-Host ""
 Write-Host "启动开发服务器..." -ForegroundColor Yellow
-Write-Host "浏览器将自动打开: http://localhost:3000" -ForegroundColor Cyan
+Write-Host "浏览器访问: http://localhost:3000" -ForegroundColor Cyan
 Write-Host "按 Ctrl+C 停止服务器" -ForegroundColor DarkGray
 Write-Host ""
 

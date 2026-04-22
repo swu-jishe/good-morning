@@ -1,4 +1,4 @@
-export type PageType = 'dashboard' | 'schedule' | 'settings';
+export type PageType = 'dashboard' | 'schedule' | 'settings' | 'profile';
 export type AgentType = 'judgment' | 'planning' | 'policy';
 export type SourceType = 'competition' | 'exam' | 'course' | 'activity' | 'system';
 

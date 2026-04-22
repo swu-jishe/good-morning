@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Calendar, ListTodo, MoreVertical, Filter, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Calendar, ListTodo, MoreVertical, Filter, ExternalLink, ChevronLeft, ChevronRight, Sparkles, CheckCircle2 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '../lib/utils';
 import { EventItem } from '../types';
@@ -159,7 +159,7 @@ export default function ScheduleView() {
               transition={{ duration: 0.3 }}
               className="flex-1 flex flex-col"
             >
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 mb-4">
                  <span className={cn("text-xs font-bold px-3 py-1 rounded-lg border", sourceColors[selectedEvent.source])}>
                   {sourceLabels[selectedEvent.source]}
                 </span>
@@ -169,14 +169,18 @@ export default function ScheduleView() {
                     紧急待办
                   </span>
                 )}
+                {/* Orchestration Writeback Marker */}
+                <span className="text-xs font-bold px-3 py-1 rounded-lg text-indigo-600 bg-indigo-50 border border-indigo-200 flex items-center gap-1">
+                  <Sparkles size={12} /> 被 Agent 重新排期
+                </span>
                 <button className="ml-auto text-slate-400 hover:text-slate-600"><MoreVertical size={20} /></button>
               </div>
 
               <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-6 leading-tight tracking-tight">{selectedEvent.title}</h2>
 
-              <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="grid grid-cols-2 gap-4 mb-6">
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                  <div className="text-xs text-slate-500 mb-1 font-medium">截止时间</div>
+                  <div className="text-xs text-slate-500 mb-1 font-medium">修改后执行时间</div>
                   <div className="font-bold text-slate-800 text-lg">{selectedEvent.date} {selectedEvent.time}</div>
                 </div>
                 <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col justify-center">
@@ -184,33 +188,55 @@ export default function ScheduleView() {
                   <div className="font-bold text-indigo-700 text-sm mt-1">{selectedEvent.actionRequired}</div>
                 </div>
               </div>
-
-              <div className="mb-8">
-                <h4 className="font-bold text-slate-800 mb-3 text-sm">内容摘要聚合</h4>
-                <p className="text-slate-600 leading-relaxed text-sm bg-slate-50 border border-slate-100 p-5 rounded-2xl">
-                  {selectedEvent.summary}
-                </p>
+              
+              {/* Task Breakdown Area */}
+              <div className="mb-6">
+                <h4 className="font-bold text-slate-800 mb-3 text-sm">智能任务拆解区</h4>
+                <div className="space-y-2 border border-slate-100 p-4 rounded-2xl bg-white shadow-sm">
+                   {[
+                     { id: 1, title: '检查学信网账号密码是否可用', time: '预计 2 分钟', done: true },
+                     { id: 2, title: '准备身份证正反面照片上传', time: '预计 5 分钟', done: false },
+                     { id: 3, title: '登录系统完成在线承诺书签署', time: '预计 3 分钟', done: false }
+                   ].map(sub => (
+                      <div key={sub.id} className="flex items-center gap-3 group">
+                        <div className={cn("w-4 h-4 rounded border flex items-center justify-center shrink-0 cursor-pointer transition-colors", sub.done ? "bg-emerald-500 border-emerald-500 text-white" : "border-slate-300 hover:border-emerald-400")}>
+                           <CheckCircle2 size={12} className={cn(sub.done ? "opacity-100" : "opacity-0")} />
+                        </div>
+                        <span className={cn("text-[13px] font-medium transition-colors", sub.done ? "text-slate-400 line-through" : "text-slate-700")}>{sub.title}</span>
+                        <span className="ml-auto text-[11px] text-slate-400 font-medium">{sub.time}</span>
+                      </div>
+                   ))}
+                </div>
               </div>
 
-              <div className="mt-auto flex gap-4 pt-4">
-                <button className="flex-1 bg-white hover:bg-slate-50 border-2 border-slate-200 text-slate-700 font-bold py-3.5 px-6 rounded-2xl shadow-sm transition-all active:scale-[0.98]">
-                  标记完成
-                </button>
-                {selectedEvent.url ? (
-                  <a 
-                    href={selectedEvent.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="flex-[2] flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-md shadow-indigo-200 transition-all active:scale-[0.98] group"
-                  >
-                    去办理 
-                    <ExternalLink size={16} className="opacity-70 group-hover:opacity-100 transition-opacity" />
-                  </a>
-                ) : (
-                  <button className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3.5 px-6 rounded-2xl shadow-md shadow-indigo-200 transition-all active:scale-[0.98]">
-                    联系 Agent 辅助
-                  </button>
-                )}
+              {/* Execution Confirmation & Feedback Area */}
+              <div className="mt-auto bg-slate-50/80 border border-slate-200 rounded-2xl p-5">
+                 <div className="flex items-center justify-between mb-4">
+                    <span className="text-[13px] font-bold text-slate-800">执行确认与回写状态</span>
+                    <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 border border-emerald-100 px-2 py-1 rounded-md flex items-center gap-1">
+                      <CheckCircle2 size={12} /> 已写入外部日程
+                    </span>
+                 </div>
+                 <div className="flex gap-4">
+                    <button className="flex-1 bg-white hover:bg-slate-100 border border-slate-200 text-slate-700 font-bold py-3 px-4 rounded-xl shadow-sm transition-all active:scale-[0.98] text-[13px]">
+                      生成强提醒 (电话)
+                    </button>
+                    {selectedEvent.url ? (
+                      <a 
+                        href={selectedEvent.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex-[2] flex justify-center items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-indigo-200 transition-all active:scale-[0.98] group text-[13px]"
+                      >
+                        跳转外部执行 
+                        <ExternalLink size={14} className="opacity-70 group-hover:opacity-100 transition-opacity" />
+                      </a>
+                    ) : (
+                      <button className="flex-[2] bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow-md shadow-indigo-200 transition-all active:scale-[0.98] text-[13px]">
+                        进入执行队列
+                      </button>
+                    )}
+                 </div>
               </div>
             </motion.div>
           </div>

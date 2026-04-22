@@ -1,6 +1,6 @@
-# Goal Radar Demo
+# 知途（ZhiTu）Demo
 
-面向大学生学业与升学场景的前端演示项目，核心展示 **信息聚合工作台 + 日程详情 + 订阅配置 + 常驻 Agent 抽屉** 的产品形态。
+面向大学生学业规划、成长决策与任务协同场景的前端演示项目。当前版本重点展示 **信息聚合工作台 + 日程编排 + 订阅规则 + 成长档案 + 常驻 Agent 抽屉** 的闭环产品形态。
 
 ## 在线预览
 
@@ -10,20 +10,21 @@
 
 ## 项目简介
 
-Goal Radar 是一个用于比赛演示的视频化前端 Demo，强调三件事：
+知途是一个用于比赛演示的前端 Demo，核心强调三件事：
 
-- **信息聚合**：统一展示考研、竞赛、课程作业、考试、学校通知等来源
-- **AI 助理**：通过 3 个 Agent 提供信息研判、日程规划与策略支持
-- **产品感**：以 Bento 工作台为中心，形成完整可讲述的交互闭环
+- **信息聚合**：聚合竞赛、课程、考试、通知等多源信息
+- **任务协同**：通过 Agent 对复杂信息进行理解、编排与确认回写
+- **成长主线**：通过成长档案页承接长期目标、阶段进展与能力画像
 
-当前仓库为 **Vite + React + TypeScript** 的纯前端演示项目。
+当前仓库为 **Vite + React + TypeScript** 的前端演示项目，页面内容以产品展示与交互叙事为主。
 
-## 页面结构
+## 当前页面结构
 
-- **聚合工作台**：首页主视觉，展示 AI 简报、高优预警、倒计时、时间轴与多源信息卡片
-- **日程详情页**：展示本周重点事项、月历视图与单条事件详情
-- **订阅配置页**：展示信息源接入、关注词与配置管理
-- **常驻 Agent 抽屉**：跨页面存在的右侧交互区
+- **聚合工作台**：展示 AI 简报、高优预警、今日重点与多源信息入口
+- **日程编排**：展示清单、月历、任务详情与执行结果
+- **订阅规则**：展示信息源接入、关注词与规则管理
+- **成长档案**：展示长期目标、阶段进展、能力画像与里程碑
+- **常驻 Agent 抽屉**：跨页面存在，用于信息研判、任务编排与策略支持
 
 ## 技术栈
 
@@ -47,17 +48,16 @@ project/
 │  ├─ views/
 │  │  ├─ DashboardView.tsx
 │  │  ├─ ScheduleView.tsx
-│  │  └─ SettingsView.tsx
+│  │  ├─ SettingsView.tsx
+│  │  └─ ProfileView.tsx
 │  ├─ App.tsx
 │  ├─ index.css
 │  ├─ main.tsx
 │  └─ types.ts
 ├─ docs/
-│  └─ superpowers/
-│     └─ spec.md
-├─ skills/
 ├─ .env.example
 ├─ index.html
+├─ metadata.json
 ├─ package.json
 ├─ start.ps1
 ├─ tsconfig.json
@@ -69,19 +69,33 @@ project/
 - Node.js 18+（推荐 Node.js 20+）
 - npm 9+
 
-## 本地开发启动
+## 本地启动
 
 ### 一键启动（推荐）
 
-Windows 用户直接双击运行：
+Windows 用户可直接运行：
 
-```text
-start.ps1
+```powershell
+.\start.ps1
 ```
 
-脚本会自动检查 Node.js 环境、安装依赖并启动开发服务器。
+脚本会自动：
 
-> 如果提示"无法运行脚本"，请先在 PowerShell 中执行：`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
+- 检查 Node.js / npm
+- 在缺少依赖时执行 `npm install`
+- 启动本地开发服务器
+
+默认访问地址：
+
+```text
+http://localhost:3000
+```
+
+如果 PowerShell 提示脚本无法执行，可先运行：
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
 
 ### 手动启动
 
@@ -111,8 +125,6 @@ http://localhost:3000
 npm run build
 ```
 
-构建产物默认输出到 `dist/`。
-
 ### 本地预览构建结果
 
 ```bash
@@ -125,38 +137,45 @@ npm run preview
 http://localhost:4173
 ```
 
-## 可用命令
+## 常用命令
 
 ```bash
 npm run dev      # 启动开发环境（3000 端口）
 npm run build    # 构建生产版本
-npm run preview  # 预览 dist 构建结果（4173 端口）
+npm run preview  # 预览 dist 构建结果
 npm run lint     # TypeScript 类型检查
 npm run clean    # 清理 dist 目录
 ```
 
 ## 环境变量说明
 
-仓库中提供了 `.env.example`。当前 Demo 以前端静态展示为主，默认启动流程**不依赖真实后端**。
+仓库中提供 `.env.example`。当前前端演示页面本身以静态展示为主，默认启动流程**不依赖真实后端服务**。
 
-已出现的环境变量包括：
+示例变量包括：
 
-- `GEMINI_API_KEY`：保留的 AI Studio / Gemini 相关变量
-- `APP_URL`：保留的部署环境变量
+- `GEMINI_API_KEY`
+- `APP_URL`
 
-如果只是本地查看当前 Demo 界面，通常不需要额外配置真实服务。
+如果只是本地打开并演示当前页面，通常无需额外配置真实密钥。
 
-## 适合演示的操作路径
+## 推荐演示链路
 
-推荐演示顺序：
+推荐按下面顺序演示：
 
-1. 打开 **聚合工作台**，先讲 AI 简报与高优预警
-2. 切换到 **日程详情页**，展示事项详情与月历
-3. 打开 **订阅配置页**，展示信息源与关注词管理
-4. 结合右侧 **Agent 抽屉** 演示不同页面下的上下文变化
+1. 在 **聚合工作台** 展示 AI 简报与高优预警
+2. 通过右侧 **Agent 抽屉** 说明信息研判、任务编排与策略支持
+3. 切到 **日程编排** 展示任务清单、月历与状态结果
+4. 切到 **订阅规则** 展示信息源与规则配置
+5. 最后进入 **成长档案**，展示长期目标、能力画像与主线成长记录
 
-## 说明
+## 比赛说明
 
-- 当前项目以比赛展示为目标，偏重界面、叙事和产品感
-- `docs/superpowers/spec.md` 为前端设计与演示 spec
-- 若后续继续扩展，可在 `src/views` 和 `src/components` 下按页面与组件继续拆分
+- 当前项目以计算机设计大赛演示为目标
+- 强调前端产品感、交互叙事与页面闭环
+- `docs/` 下保留作品报告、spec 与相关设计文档
+
+## 备注
+
+- 当前代码已同步为 4 页面结构版本
+- README 保留了比赛说明、在线预览地址与 `start.ps1` 启动方式
+- 如需继续扩展，可优先从 `src/views` 与 `src/components` 拆分细化

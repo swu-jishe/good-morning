@@ -5,11 +5,12 @@ import AgentDrawer from './components/AgentDrawer';
 import DashboardView from './views/DashboardView';
 import ScheduleView from './views/ScheduleView';
 import SettingsView from './views/SettingsView';
+import ProfileView from './views/ProfileView';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<PageType>('dashboard');
 
-  // Derived agent type based on page context
+  // Derived agent type based on page context (Settings => Policy, Profile => Policy for now, can adjust)
   const currentAgentType: AgentType = 
     currentPage === 'dashboard' ? 'judgment' : 
     currentPage === 'schedule' ? 'planning' : 'policy';
@@ -26,6 +27,7 @@ export default function App() {
            {currentPage === 'dashboard' && <DashboardView />}
            {currentPage === 'schedule' && <ScheduleView />}
            {currentPage === 'settings' && <SettingsView />}
+           {currentPage === 'profile' && <ProfileView />}
         </div>
       </main>
 

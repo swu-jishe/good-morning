@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, ExternalLink, RefreshCw, Globe, Rss, Link2, MoreVertical, BellRing, Database, ArrowLeft, ArrowUpRight } from 'lucide-react';
+import { Plus, ExternalLink, RefreshCw, Globe, Rss, Link2, MoreVertical, BellRing, Database, ArrowLeft, ArrowUpRight, AlertCircle } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useState } from 'react';
 
@@ -167,26 +167,118 @@ export default function SettingsView() {
                 </div>
               </section>
 
-              <section>
-                <div className="flex items-center gap-2 mb-4">
-                  <BellRing size={18} className="text-slate-600" />
-                  <h2 className="text-lg font-bold text-slate-800">Agent 预警提示词</h2>
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
+                {/* Skill Rules Area */}
+                <section className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden">
+                   <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
+                     <Database size={100} />
+                   </div>
+                   <div className="flex items-center gap-3 mb-6 relative z-10">
+                     <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
+                       <Database size={20} />
+                     </div>
+                     <h2 className="text-xl font-bold text-slate-800">Skill 联动池规则</h2>
+                   </div>
+                   <p className="text-sm text-slate-500 font-medium mb-6 relative z-10 leading-relaxed">
+                     以下定义了当前系统不同能力的授权边界与产出形态。该配置决定了你在右侧 Agent 对话窗口中能够触发的操作类型。
+                   </p>
+                   
+                   <div className="space-y-4 relative z-10">
+                      <div className="p-4 border border-slate-100 rounded-2xl bg-slate-50/80 hover:border-indigo-200 transition-colors">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xs font-bold text-slate-900 bg-white border border-slate-200 px-2 py-1 rounded-lg">系统</span>
+                          <span className="font-bold text-slate-800 text-sm">全局情报提纯</span>
+                        </div>
+                        <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                          由"信息研判 Agent"主导。无需确认，直接抽取提取关键要素并呈现在【聚合工作台】中。
+                        </p>
+                      </div>
+
+                      <div className="p-4 border border-slate-100 rounded-2xl bg-slate-50/80 hover:border-indigo-200 transition-colors">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xs font-bold text-slate-900 bg-white border border-slate-200 px-2 py-1 rounded-lg">编排</span>
+                          <span className="font-bold text-slate-800 text-sm">日程排期与回写</span>
+                        </div>
+                        <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                          由"日程规划 Agent"主导。生成排期后，<span className="text-rose-500 font-bold">必须经由用户主动确认</span>（点击交互卡片或口语确认）后才进行系统级落库。允许撤销重做。
+                        </p>
+                      </div>
+
+                      <div className="p-4 border border-slate-100 rounded-2xl bg-slate-50/80 hover:border-indigo-200 transition-colors">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-xs font-bold text-slate-900 bg-white border border-slate-200 px-2 py-1 rounded-lg">决策</span>
+                          <span className="font-bold text-slate-800 text-sm">主干长期目标建议</span>
+                        </div>
+                        <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                          由"策略支持 Agent"主导。需要长期的上下文支持。操作仅生成建议预览卡，系统不会强制干预执行。
+                        </p>
+                      </div>
+                   </div>
+                </section>
+
+                <div className="flex flex-col gap-6">
+                  {/* Reminder Strategy */}
+                  <section className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm flex-1">
+                     <div className="flex items-center gap-3 mb-6">
+                       <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center text-orange-600">
+                         <BellRing size={20} />
+                       </div>
+                       <h2 className="text-lg font-bold text-slate-800">高优预警与提醒策略</h2>
+                     </div>
+                     <div className="space-y-4">
+                       <p className="text-sm text-slate-500 font-medium mb-4">当满足以下条件时，将触发系统级阻断性工作流：</p>
+                       <div className="grid grid-cols-2 gap-3">
+                          <div className="bg-slate-50 p-3 border border-slate-100 rounded-xl">
+                            <span className="text-[11px] font-bold text-slate-400 block mb-1">时间阈值</span>
+                            <span className="text-sm font-bold text-slate-700">死线前 48 小时</span>
+                          </div>
+                          <div className="bg-slate-50 p-3 border border-slate-100 rounded-xl">
+                            <span className="text-[11px] font-bold text-slate-400 block mb-1">冲突判定</span>
+                            <span className="text-sm font-bold text-slate-700">强物理占用重叠</span>
+                          </div>
+                       </div>
+                       <div className="mt-4 p-4 bg-orange-50/50 border border-orange-100 flex items-start gap-3 rounded-xl">
+                          <span className="text-orange-500 mt-0.5"><AlertCircle size={16} /></span>
+                          <p className="text-xs text-orange-800 font-medium leading-relaxed">
+                            当存在未确认或逾期风险极高的行动项时，系统默认最高触达方式为：<span className="font-bold text-rose-600 underline underline-offset-2">自动系统电话呼叫 / 强音效推送</span>。
+                          </p>
+                       </div>
+                     </div>
+                  </section>
+
+                  {/* Exception Receipt Area */}
+                  <section className="bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm flex-1 relative overflow-hidden group">
+                     <div className="absolute -top-20 -right-20 w-48 h-48 bg-indigo-500/20 blur-3xl rounded-full pointer-events-none" />
+                     <div className="flex items-center gap-3 mb-4">
+                       <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white">
+                         <RefreshCw size={20} />
+                       </div>
+                       <h2 className="text-lg font-bold text-white">异常控制与回执</h2>
+                     </div>
+                     
+                     <div className="space-y-3 mt-6">
+                        <div className="flex items-center justify-between border-b border-white/10 pb-3">
+                           <div className="text-[13px] font-bold text-slate-300">等待用户确认 (Pending)</div>
+                           <div className="w-16 h-1 bg-white/10 rounded-full overflow-hidden flex">
+                              <div className="h-full bg-amber-400 w-1/2 animate-pulse" />
+                           </div>
+                        </div>
+                        <div className="flex items-center justify-between border-b border-white/10 pb-3 mt-1">
+                           <div className="text-[13px] font-bold text-slate-300">仅限建议不回写 (Read-Only)</div>
+                           <div className="w-16 h-1 bg-white/10 rounded-full overflow-hidden flex">
+                              <div className="h-full bg-slate-400 w-full" />
+                           </div>
+                        </div>
+                        <div className="flex items-center justify-between pt-1">
+                           <div className="text-[13px] font-bold text-slate-300">API 拉取断连 (Failed)</div>
+                           <div className="w-16 h-1 bg-white/10 rounded-full overflow-hidden flex">
+                              <div className="h-full bg-rose-500 w-1/4" />
+                           </div>
+                        </div>
+                     </div>
+                  </section>
                 </div>
-                <div className="bg-white border border-slate-100 p-6 rounded-3xl shadow-sm">
-                  <p className="text-sm text-slate-500 mb-4">当原始信息源捕获到包含以下关键词的内容时，Agent 将提取并把它标记为“高优预警”投递至工作台：</p>
-                  <div className="flex flex-wrap gap-2">
-                    {['截止', '考研大纲变更', '复试分数线', '报名确认', '网络安全', '上机测试', '组队要求'].map(keyword => (
-                      <span key={keyword} className="bg-slate-50 text-slate-700 border border-slate-200 px-3 py-1.5 rounded-xl text-xs font-medium flex items-center gap-2 shadow-sm">
-                        {keyword}
-                        <button className="text-slate-400 hover:text-rose-500 transition-colors"><Plus className="rotate-45" size={14}/></button>
-                      </span>
-                    ))}
-                    <button className="bg-white border border-dashed border-slate-300 text-slate-400 px-3 py-1.5 rounded-xl text-xs font-medium cursor-pointer hover:border-indigo-400 hover:text-indigo-600 transition-colors flex items-center gap-1">
-                      <Plus size={14} /> 新增关注词
-                    </button>
-                  </div>
-                </div>
-              </section>
+              </div>
             </div>
           </motion.div>
         )}

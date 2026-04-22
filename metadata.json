@@ -1,6 +1,6 @@
 {
-  "name": "Goal Radar (目标雷达)",
-  "description": "大学生学业与升学信息聚合工作台。聚合多源信息，提供Agent化辅助提醒与排程功能。",
+  "name": "知途 (ZhiTu)",
+  "description": "面向大学生学业规划、成长决策与任务协同的前端演示项目，聚合多源信息并通过 Agent 抽屉承接任务理解与编排。",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }
