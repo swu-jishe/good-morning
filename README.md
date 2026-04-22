@@ -2,6 +2,12 @@
 
 面向大学生学业与升学场景的前端演示项目，核心展示 **信息聚合工作台 + 日程详情 + 订阅配置 + 常驻 Agent 抽屉** 的产品形态。
 
+## 在线预览
+
+直接访问线上版本：
+
+> <https://aistudio.google.com/apps/332d005c-27fb-4e04-922f-b26ec8873b2d?showAssistant=true&showPreview=true>
+
 ## 项目简介
 
 Goal Radar 是一个用于比赛演示的视频化前端 Demo，强调三件事：
@@ -53,6 +59,7 @@ project/
 ├─ .env.example
 ├─ index.html
 ├─ package.json
+├─ start.ps1
 ├─ tsconfig.json
 └─ vite.config.ts
 ```
@@ -64,31 +71,33 @@ project/
 
 ## 本地开发启动
 
+### 一键启动（推荐）
+
+Windows 用户直接双击运行：
+
+```text
+start.ps1
+```
+
+脚本会自动检查 Node.js 环境、安装依赖并启动开发服务器。
+
+> 如果提示"无法运行脚本"，请先在 PowerShell 中执行：`Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`
+
+### 手动启动
+
 1. 安装依赖：
 
 ```bash
 npm install
 ```
 
-2. 如需本地补充环境变量，可参考示例文件创建 `.env.local`：
-
-```bash
-cp .env.example .env.local
-```
-
-Windows PowerShell 可用：
-
-```powershell
-Copy-Item .env.example .env.local
-```
-
-3. 启动开发服务器：
+2. 启动开发服务器：
 
 ```bash
 npm run dev
 ```
 
-4. 浏览器访问：
+3. 浏览器访问：
 
 ```text
 http://localhost:3000
