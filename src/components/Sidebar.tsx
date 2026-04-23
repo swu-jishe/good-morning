@@ -1,5 +1,5 @@
 import { PageType } from '../types';
-import { LayoutDashboard, CalendarDays, Settings, Radar, BookOpen } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, Settings, Radar, BookOpen, GraduationCap } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
 import { useState } from 'react';
@@ -14,9 +14,10 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
 
   const navItems = [
     { id: 'dashboard', label: '聚合工作台', icon: LayoutDashboard },
+    { id: 'academic', label: '学业规划', icon: GraduationCap },
     { id: 'schedule', label: '日程编排', icon: CalendarDays },
-    { id: 'settings', label: '订阅规则', icon: Settings },
     { id: 'profile', label: '成长档案', icon: BookOpen },
+    { id: 'settings', label: '订阅规则', icon: Settings },
   ] as const;
 
   return (
@@ -25,7 +26,7 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={cn(
-          "absolute left-0 top-0 h-full bg-white border-r border-slate-100 shadow-[4px_0_24px_rgba(0,0,0,0.03)] transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] overflow-hidden",
+          "absolute left-0 top-0 h-full bg-white border-r border-slate-100 shadow-sm transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] overflow-hidden",
           isHovered ? "w-[16.25rem]" : "w-[5.5rem]"
         )}
       >
@@ -36,8 +37,8 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
               <Radar size={24} strokeWidth={2.5} />
             </div>
             <div className={cn("transition-opacity duration-300 flex flex-col justify-center", isHovered ? "opacity-100 delay-100" : "opacity-0")}>
-              <h1 className="font-bold text-slate-900 text-[17px] tracking-tight leading-tight">知途</h1>
-              <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md inline-block w-fit mt-0.5">
+              <h1 className="font-bold text-slate-900 text-[19px] tracking-tight leading-tight">知途</h1>
+              <span className="text-[12px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md inline-block w-fit mt-0.5">
                 任务协同闭环
               </span>
             </div>
@@ -64,7 +65,7 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                   )}
                   <Icon size={20} className={cn("shrink-0", isActive ? "text-indigo-600" : "text-slate-400 group-hover:text-slate-600")} />
                   <span className={cn(
-                    "ml-3.5 transition-opacity duration-300 whitespace-nowrap text-[15px]", 
+                    "ml-3.5 transition-opacity duration-300 whitespace-nowrap text-[17px]", 
                     isHovered ? "opacity-100 delay-100" : "opacity-0 pointer-events-none",
                     isActive ? "text-indigo-700" : "text-slate-500 group-hover:text-slate-900"
                   )}>
@@ -73,17 +74,6 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                 </button>
               );
             })}
-          </div>
-          
-          {/* Target Progress Widget */}
-          <div className={cn("px-5 transition-opacity duration-300", isHovered ? "opacity-100 delay-100" : "opacity-0 pointer-events-none")}>
-            <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-100">
-              <div className="text-xs font-semibold text-slate-400 mb-1">当前主干长期目标</div>
-              <div className="font-bold text-slate-800 text-[13px]">2026年双一流初试</div>
-              <div className="mt-3 bg-slate-200/60 h-1.5 rounded-full overflow-hidden">
-                <div className="bg-indigo-500 h-full w-[65%] rounded-full shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
-              </div>
-            </div>
           </div>
         </div>
       </nav>

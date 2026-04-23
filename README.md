@@ -20,10 +20,11 @@
 
 ## 当前页面结构
 
-- **聚合工作台**：展示 AI 简报、高优预警、今日重点与多源信息入口
-- **日程编排**：展示清单、月历、任务详情与执行结果
-- **订阅规则**：展示信息源接入、关注词与规则管理
-- **成长档案**：展示长期目标、阶段进展、能力画像与里程碑
+- **聚合工作台**：展示 AI 简报、高优预警、多智能体协同流水线（MAS-GPT 可视化）与多源信息入口
+- **学业规划**：GPA 动态测算、学分进度、学分预警与选课建议、专业知识点拓扑图
+- **日程编排**：展示清单、月历、任务详情与 OpenClaw 多平台联动执行时间线
+- **订阅规则**：展示信息源接入、Skill 能力手册（Anthropic Agent Skills 规范）、提醒策略与异常回执
+- **成长档案**：展示长期目标、阶段进展、多维能力雷达图（当前能力 vs 目标差距）与里程碑
 - **常驻 Agent 抽屉**：跨页面存在，用于信息研判、任务编排与策略支持
 
 ## 技术栈
@@ -42,11 +43,18 @@ project/
 ├─ src/
 │  ├─ components/
 │  │  ├─ AgentDrawer.tsx
-│  │  └─ Sidebar.tsx
+│  │  ├─ Sidebar.tsx
+│  │  ├─ WorkflowVisualizer.tsx   # MAS-GPT 协同流水线
+│  │  ├─ RadarChart.tsx           # 能力雷达图
+│  │  └─ SkillCard.tsx            # Skill 手册卡 + .md 预览 Modal
+│  ├─ data/
+│  │  ├─ skills.ts                # Skill 手册 mock 数据
+│  │  └─ academic.ts              # 学业规划 mock 数据
 │  ├─ lib/
 │  │  └─ utils.ts
 │  ├─ views/
 │  │  ├─ DashboardView.tsx
+│  │  ├─ AcademicView.tsx         # 学业规划主页
 │  │  ├─ ScheduleView.tsx
 │  │  ├─ SettingsView.tsx
 │  │  └─ ProfileView.tsx
@@ -55,6 +63,8 @@ project/
 │  ├─ main.tsx
 │  └─ types.ts
 ├─ docs/
+│  └─ superpowers/
+│     └─ specs/                   # 所有 spec 迭代版本（YYYY-MM-DD-HHMM-<topic>.md）
 ├─ .env.example
 ├─ index.html
 ├─ metadata.json
