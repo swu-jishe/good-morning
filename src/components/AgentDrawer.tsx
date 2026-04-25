@@ -341,9 +341,9 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
            id: Date.now().toString() + 'sj',
            role: 'assistant',
            agentId: 'judgment',
-           text: '我已初步解析此冲突。研招网死线优先级为绝对高优(P0)，《计算机网络》实验为常规考核(P2)。建议立刻优先保底网报。\n\n已下发联动指令，请 @规划 Agent 介入排程。'
+           text: '我已初步解析此冲突。研招网ddl优先级为绝对高优(P0)，《计算机网络》实验为常规考核(P2)。建议立刻优先保底网报。\n\n已下发联动指令，请 @规划 Agent 介入排程。'
          }]);
-         petSpeak('发现死线冲突！研招网 P0 优先，交给规划 Agent～', 3500);
+         petSpeak('发现ddl冲突！研招网 P0 优先，交给规划 Agent～', 3500);
 
          setIsTyping(true);
          petSetThinking(true);
@@ -353,7 +353,7 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
               id: Date.now().toString() + 'sp',
               role: 'assistant',
               agentId: 'planning',
-              text: '收到研判要求。我已计算出安全重组方案。\n可将实验上机迁移至今日晚间执行，彻底空出周五死线节点：',
+              text: '收到研判要求。我已计算出安全重组方案。\n可将实验上机迁移至今日晚间执行，彻底空出周五ddl节点：',
               modificationCard: {
                  original: "《计算机网络》实验上机 (按原计划本周五)",
                  updated: "将计网实验上机锁定在今日 19:00",
@@ -699,7 +699,7 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
                  <div className="flex items-start gap-2.5">
                    <div className="mt-0.5"><Sparkles size={14} className="text-indigo-500" /></div>
                    <p className="text-[13px] text-indigo-800 leading-relaxed font-bold">
-                     你可以同时启用多个 Agent，他们会在后台并网计算。例如在处理混合冲突时，研判 Agent 识别死线，策略 Agent 提供优先级建议，然后交给规划 Agent 输出重排指令。
+                     你可以同时启用多个 Agent，他们会在后台并网计算。例如在处理混合冲突时，研判 Agent 识别ddl，策略 Agent 提供优先级建议，然后交给规划 Agent 输出重排指令。
                    </p>
                  </div>
               </div>

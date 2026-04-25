@@ -32,7 +32,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         {/* Card: Task Understanding */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-          data-pet-hint="高优预警区。研判 Agent 已清洗 12 条动态，现在有 1 条阻断级风险——考研报名死线。可以点击或拖到右侧 Agent 抽屉编排。"
+          data-pet-hint="高优预警区。研判 Agent 已清洗 12 条动态，现在有 1 条阻断级风险——考研报名ddl。可以点击或拖到右侧 Agent 抽屉编排。"
           className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200/60 lg:col-span-3 flex flex-col group hover:border-indigo-200 hover:shadow-md transition-all duration-300 relative"
         >
           <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-50/40 rounded-bl-full rounded-tr-3xl -z-10 pointer-events-none" />
@@ -68,7 +68,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
              <div 
                 role="button"
                 tabIndex={0}
-                data-pet-hint="这条是考研报名死线，漏掉就无法参加考试！可以单击看详情，或直接拖到右侧 Agent 抽屉编排～"
+                data-pet-hint="这条是考研报名ddl，漏掉就无法参加考试！可以单击看详情，或直接拖到右侧 Agent 抽屉编排～"
                 data-pet-hint-delay="1500"
                 className={cn(
                   "border-[1.5px] border-dashed p-4 rounded-2xl flex flex-col gap-2 relative group/card transition-all cursor-grab active:cursor-grabbing shadow-sm",
@@ -80,7 +80,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                 onDragStart={() => {
                   setDragActive(true);
                   dragOccurredRef.current = true;
-                  petSpeak('P0 死线！我跟你一起过去 Agent 抽屉，让规划 Agent 帮你重排～', 4000);
+                  petSpeak('P0 ddl！我跟你一起过去 Agent 抽屉，让规划 Agent 帮你重排～', 4000);
                 }}
                 onDragEnd={() => {
                   setDragActive(false);

@@ -294,7 +294,7 @@ export default function SettingsView() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
                   {/* Reminder Strategy */}
                   <section
-                    data-pet-hint="高优预警触发规则：死线前 48 小时自动进入阻断流，最高触达方式是系统电话呼叫。"
+                    data-pet-hint="高优预警触发规则：ddl前 48 小时自动进入阻断流，最高触达方式是系统电话呼叫。"
                     className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm hover:border-amber-200 hover:shadow-md transition-all duration-300"
                   >
                      <div className="flex items-center gap-3 mb-6">
@@ -308,7 +308,7 @@ export default function SettingsView() {
                        <div className="grid grid-cols-2 gap-3">
                           <div className="bg-slate-50 p-3 border border-slate-100 rounded-xl">
                             <span className="text-[13px] font-semibold text-slate-400 block mb-1">时间阈值</span>
-                            <span className="text-sm font-bold text-slate-700">死线前 48 小时</span>
+                            <span className="text-sm font-bold text-slate-700">ddl前 48 小时</span>
                           </div>
                           <div className="bg-slate-50 p-3 border border-slate-100 rounded-xl">
                             <span className="text-[13px] font-semibold text-slate-400 block mb-1">冲突判定</span>
