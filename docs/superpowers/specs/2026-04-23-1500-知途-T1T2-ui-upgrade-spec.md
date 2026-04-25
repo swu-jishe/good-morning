@@ -28,7 +28,7 @@
 
 现场答辩时希望评委在短时间内感受：
 
-1. 《作品报告》第三章关键技术（RAG 长期记忆 / Skill 封装 / 多智能体协同 MAS-GPT / OpenClaw 平台联动）的**前端可视化**
+1. 《作品报告》第三章关键技术（RAG 长期记忆 / Skill 封装 / 多智能体协同工作流 / OpenClaw 平台联动）的**前端可视化**
 2. 从"看到预警"到"写入日程"的**完整闭环**
 3. 产品级视觉完成度（Bento 栅格、Material Design 3 Expressive 风格）
 
@@ -46,7 +46,7 @@
 | 2 | 学业规划（Academic） | GPA 测算、学分追踪、知识点依赖 |
 | 3 | 日程编排（Schedule） | 任务详情、执行确认、多平台回写 |
 | 4 | 成长档案（Profile） | 长期目标、阶段进展、能力画像、里程碑 |
-| 5 | 订阅规则（Settings） | 信息源、Skill 手册、提醒策略 |
+| 5 | 信息源与策略（Settings） | 信息源接入抓取、Skill 手册、提醒策略、异常回执 |
 
 右侧 Agent 抽屉跨所有页面常驻。
 
@@ -110,7 +110,7 @@ Row 2: [执行流（今日）span-2] [核心成长档案 span-2] [系统上下�
 #### 协同决策网（Row 1 右）
 
 - 嵌入完整版 `WorkflowVisualizer`（详见 §5）
-- 呈现 MAS-GPT 4 层流水线：意图拆解 → 3 子 Agent 并行（研判/规划/策略）→ 主控裁决 → 结构化输出
+- 呈现 **Agent Flow 4 层协同工作流**：意图拆解 → 3 子 Agent 并行（研判/规划/策略）→ 主控裁决 → 结构化输出
 - 底部紫色 **"主控裁决 · 当前推荐动作"** 卡：`调剂至「今晚 19:00」，同步拦截周五 30 分钟`
 - 右上角脉冲胶囊：`正在处理：报名确认冲突`
 
@@ -149,7 +149,7 @@ Row 2: [执行流（今日）span-2] [核心成长档案 span-2] [系统上下�
 #### 实时 GPA 测算
 
 - 当前 GPA 大字：`3.82 / 4.0`（45 px）
-- 专业排名：`前 8%`
+- 距目标 GPA 的缺口：`+0.08`（目标 GPA 3.90），对应"target-gap"能力
 - 标识：由 `gpa-early-warning` Skill 驱动
 - **5 学期走势柱图**：
   - 使用 HTML Flex 布局（非 SVG），5 根柱 `flex-1` 等分容器宽度
@@ -165,7 +165,7 @@ Row 2: [执行流（今日）span-2] [核心成长档案 span-2] [系统上下�
 #### 学分预警与选课建议
 
 - 2 条预警：`通识教育学分不足` / `专业选修结构建议`
-- 底部黑色 **Agent 建议卡**：`下学期建议选《高级算法分析》+《科技史导论》`
+- 底部浅 indigo **Agent 建议卡**（`bg-indigo-50 border-indigo-100`）：`下学期建议选《高级算法分析》+《科技史导论》`
 
 #### 本学期在修课程表
 
@@ -282,7 +282,7 @@ Row 3: [ 阶段里程碑时间轴 span-2 ] [ Agent 长期记忆摘要 span-1 ]
 
 #### Agent 长期记忆摘要（Row 3 右）
 
-暗色卡，**3 类分组**（对应报告 3.2.1 RAG 长期记忆分层）：
+白底卡，indigo 图标强调，**3 类分组**（对应报告 3.2.1 RAG 长期记忆分层）：
 
 - **学科偏好**：数学一 / 英语一 / 408 专业课
 - **行为规律**：偏好夜间复习 / 需强制番茄钟
@@ -292,7 +292,7 @@ Row 3: [ 阶段里程碑时间轴 span-2 ] [ Agent 长期记忆摘要 span-1 ]
 
 ---
 
-### 3.5 订阅规则（Settings）
+### 3.5 信息源与策略（Settings）
 
 **定位**：信息源与能力规则管理页。
 
@@ -304,9 +304,24 @@ Row 3: [ 阶段里程碑时间轴 span-2 ] [ Agent 长期记忆摘要 span-1 ]
 
 #### 信息源卡片网格
 
-3 张信息源卡：研招网与目标院校信息 / 计算机学院教务通知 / 超星学习通课程作业抓取。每张显示图标、名称、域名链接、上次同步时间、最新原始抓取摘要、已收录条数，+ 一张"新增信息源"虚线添加卡。
+默认接入 **2 个信息源**：研招网与目标院校信息、计算机学院教务通知。每张信息源卡显示图标、名称、域名链接、上次同步时间、最新原始抓取摘要、已收录条数，+ 一张"新增信息源"虚线添加卡。
 
-点击任一卡或"查看聚合池"按钮 → **drill-down** 到该信息源的原始抓取池页面（带返回键）。
+**顶部工具条**：
+
+- 左：`已接入 N 节点` 计数徽章
+- 右：`上次自动抓取：3 分钟前`（带绿色脉冲点）+ `立即抓取` 主按钮
+
+**"立即抓取" Demo 交互**：
+
+1. 点击按钮 → 按钮进入 `抓取中 …` 状态，`RefreshCw` 图标旋转 4 秒
+2. 4 秒后：
+   - 研招网卡 `latestRaw` 更新为新获取内容（考场名单与入场须知），条数 34 → 36，同步时间 → `刚刚`
+   - 列表追加第 3 个信息源（超星学习通课程作业抓取）
+   - 工具条 `上次自动抓取` 文字改为 `刚刚`
+   - 研招网卡获得 **indigo ring + `新抓取` 徽章**，6 秒后自动消除
+3. 新增卡使用 motion.div `layout + initial/animate` 淡入入场
+
+点击任一信息源卡或"查看聚合池"按钮 → **drill-down** 到该信息源的原始抓取池页面（带返回键）。
 
 #### Skill 能力手册
 
@@ -327,7 +342,7 @@ Row 3: [ 阶段里程碑时间轴 span-2 ] [ Agent 长期记忆摘要 span-1 ]
 
 #### 异常控制与回执
 
-暗色卡，3 条状态条：Pending（等待用户确认）/ Read-Only（仅建议不回写）/ Failed（API 拉取断连）。
+白底卡，3 条状态条：Pending（等待用户确认，amber 脉冲）/ Read-Only（仅建议不回写，slate）/ Failed（API 拉取断连，rose）。
 
 ---
 
@@ -380,13 +395,13 @@ Agent 返回的修改预览卡包含：
 
 ---
 
-## 5. 多智能体协同机制（MAS-GPT）
+## 5. 多智能体协同工作流（Agent Flow）
 
 对应《作品报告》3.2.3 小节。
 
 ### 5.1 设计理念
 
-参考 MAS-GPT：把"如何针对当前用户需求组织合适的执行结构"本身视为生成任务。前端用 `WorkflowVisualizer` 呈现这个过程。
+核心思路：把"如何针对当前用户需求组织合适的执行结构"本身视为生成任务，不使用固定静态工作流。前端用 `WorkflowVisualizer` 呈现这个过程，并在组件标识处挂 "Agent Flow" 徽章与当前正在处理的任务胶囊。
 
 ### 5.2 WorkflowVisualizer 4 层流水线
 
@@ -577,7 +592,9 @@ interface RadarChartProps {
 | Warning | `amber` | 轻微风险 / 待关注 |
 | Danger | `rose` | 严重风险 / 落后 |
 | Accent | `violet` | 策略 Agent / OpenClaw / Skill 徽章 |
-| Neutral Dark | `slate-900` | 暗色强调卡（执行流、Agent 记忆） |
+| Neutral | `slate` (50-900 全档) | 卡片背景（white/border/shadow）+ KnowledgeTopology icon box 使用 slate-100 |
+
+**全站卡片统一使用白底**（含曾经的执行流、Agent 长期记忆摘要、异常回执等四个原暗色卡，已全部迁移为 `bg-white border border-slate-100/200`）。`bg-slate-900` 仅保留在极少数强调场景：WorkflowVisualizer 主控节点色、SkillCard 详情 Modal 代码块背景、AgentDrawer 配置面板保存按钮。
 
 **钉钉品牌色 `sky` 仅用于 WritebackTimeline 的钉钉节点**；全局不使用 `orange` / `purple`（已归并到 amber / violet）。
 
@@ -625,7 +642,7 @@ interface RadarChartProps {
 |---|---|
 | 3.2.1 RAG 个体长期记忆 | Profile "Agent 长期记忆摘要"（3 类分组 tag 云） |
 | 3.2.2 Skill 技能封装（Anthropic 规范） | Settings "Skill 能力手册"（4 张卡 + .md Modal） |
-| 3.2.3 多智能体任务理解与协同（MAS-GPT） | Dashboard "协同决策网"（WorkflowVisualizer）+ Agent 抽屉 ModCard 编排 |
+| 3.2.3 多智能体任务理解与协同 | Dashboard "协同决策网"（WorkflowVisualizer + Agent Flow 徽章）+ Agent 抽屉 ModCard 编排 |
 | 3.2.4 基于 OpenClaw 的平台联动 | Schedule 详情 "多平台联动时间线" + ScheduleContext 写入闭环 |
 | 3.2.5 隐私安全 | 当前未落地（见 §13） |
 | 1.3 学业规划模块 | Academic 整页（GPA / 学分 / 预警 / 课程表 / 拓扑） |
@@ -656,7 +673,7 @@ src/
 ├─ components/
 │  ├─ Sidebar.tsx                  左侧悬浮导航（5 项）
 │  ├─ AgentDrawer.tsx              抽屉 + CitationBlock + ModCardBlock + 可调宽
-│  ├─ WorkflowVisualizer.tsx       MAS-GPT 4 层流程图（完整 / compact 两种模式）
+│  ├─ WorkflowVisualizer.tsx       Agent Flow 4 层协同工作流（完整 / compact 两种模式）
 │  ├─ RadarChart.tsx               能力雷达 SVG
 │  └─ SkillCard.tsx                Skill 卡 + .md 预览 Modal
 ├─ views/
@@ -664,7 +681,7 @@ src/
 │  ├─ AcademicView.tsx             学业规划
 │  ├─ ScheduleView.tsx             日程编排
 │  ├─ ProfileView.tsx              成长档案
-│  └─ SettingsView.tsx             订阅规则
+│  └─ SettingsView.tsx             信息源与策略
 ├─ context/
 │  └─ ScheduleContext.tsx          全局事件 + writeback
 ├─ data/
@@ -731,12 +748,12 @@ npm run clean     # 清理 dist
 以下内容已有技术路径，**当前 Demo 未落地**，是下一阶段可以继续推进的方向：
 
 - **路由切换过渡动画**：`AnimatePresence` 包裹 view
-- **术语 Tooltip**：MAS-GPT / OpenClaw / RAG / P0 等术语悬停显示解释
+- **术语 Tooltip**：Agent Flow / OpenClaw / RAG / P0 等术语悬停显示解释
 - **多套 Mock 剧情**：目前仅有 "考研报名 vs 计网实验" 一个冲突场景，可补 "期末 vs 大创" / "保研材料 vs 竞赛国赛" 等
 - **"一键演示" 按钮**：自动串起 Dashboard → 拖拽 → 抽屉 → ModCard → Schedule → Profile 完整叙事
 - **抽屉引用块（Quote Block）**：目前拖拽只预填文本，未做富引用块视觉
 - **对话 → 主页面反向定位**：点击抽屉内引用的任务卡自动滚动主页面定位
 - **隐私安全可视化**：对应报告 3.2.5，分层存储 / sandbox / 用户确认写入的前端呈现
 - **目标模式切换**：考研 / 保研 / 竞赛 / 求职的主干切换，页面内容联动
-- **主控 Agent 显式化**：把 MAS-GPT 的"主控"作为第 4 个 Agent 单独可见
+- **主控 Agent 显式化**：把 Agent Flow 中的"主控"作为第 4 个 Agent 单独可见
 - **真实模型 / 平台接入**：Gemini API、钉钉 Webhook、教务接口（超出纯前端 Demo 范围）

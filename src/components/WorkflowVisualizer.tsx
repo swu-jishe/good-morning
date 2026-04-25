@@ -154,7 +154,7 @@ interface WorkflowVisualizerProps {
 
 export default function WorkflowVisualizer({
   title = '多智能体协同流水线',
-  hint = '基于 MAS-GPT 理念：意图拆解 → 子 Agent 并行 → 主控裁决 → 结构化输出',
+  hint = '多智能体协同工作流：意图拆解 → 子 Agent 并行 → 主控裁决 → 结构化输出',
   compact = false,
 }: WorkflowVisualizerProps) {
   return (
@@ -174,7 +174,7 @@ export default function WorkflowVisualizer({
           </div>
         </div>
         <span className="shrink-0 text-[11px] font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 rounded uppercase tracking-widest">
-          MAS-GPT
+          Agent Flow
         </span>
       </div>
 

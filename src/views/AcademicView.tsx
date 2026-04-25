@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 import {
   GraduationCap,
   TrendingUp,
-  Award,
+  Target,
   AlertTriangle,
   Info,
   BookOpen,
@@ -13,7 +13,7 @@ import { cn } from '../lib/utils';
 import {
   GPA_BY_SEMESTER,
   CURRENT_GPA,
-  GPA_RANK_PERCENT,
+  TARGET_GPA,
   CREDIT_CATEGORIES,
   ONGOING_COURSES,
   KNOWLEDGE_NODES,
@@ -60,10 +60,10 @@ function GpaCard() {
         </div>
         <div className="text-sm text-slate-500 font-semibold pb-1">/ {maxGpa.toFixed(1)}</div>
         <div className="ml-auto text-right">
-          <div className="text-[12px] text-slate-400 font-bold uppercase tracking-wider">专业排名</div>
-          <div className="text-[15px] font-bold text-emerald-600 flex items-center gap-1 justify-end">
-            <Award size={12} />
-            前 {GPA_RANK_PERCENT}%
+          <div className="text-[12px] text-slate-400 font-semibold uppercase tracking-wider">距目标 {TARGET_GPA.toFixed(1)}</div>
+          <div className="text-[15px] font-bold text-indigo-600 flex items-center gap-1.5 justify-end tabular-nums">
+            <Target size={12} />
+            +{(TARGET_GPA - CURRENT_GPA).toFixed(2)}
           </div>
         </div>
       </div>
@@ -262,13 +262,13 @@ function WarningCard() {
           </div>
         ))}
 
-        <div className="mt-auto p-3.5 rounded-2xl bg-slate-900 text-white flex gap-2.5 items-start">
-          <Sparkles size={14} className="shrink-0 mt-0.5 text-indigo-300" />
+        <div className="mt-auto p-3.5 rounded-2xl bg-indigo-50 border border-indigo-100 flex gap-2.5 items-start">
+          <Sparkles size={14} className="shrink-0 mt-0.5 text-indigo-600" />
           <div>
-            <div className="text-[12px] font-bold text-indigo-300 uppercase tracking-widest mb-0.5">
+            <div className="text-[12px] font-bold text-indigo-700 uppercase tracking-widest mb-0.5">
               Agent 建议
             </div>
-            <div className="text-[14px] font-bold leading-relaxed">
+            <div className="text-[14px] font-semibold leading-relaxed text-slate-800">
               下学期建议选《高级算法分析》+《科技史导论》，同时补齐通识学分与考研冲刺短板。
             </div>
           </div>
@@ -379,7 +379,7 @@ function KnowledgeTopology() {
     <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6">
       <div className="flex items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center">
+          <div className="w-10 h-10 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center">
             <Network size={18} />
           </div>
           <div>

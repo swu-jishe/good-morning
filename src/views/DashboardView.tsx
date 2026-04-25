@@ -165,39 +165,39 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         {/* Timeline Card */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}
-          className="bg-slate-900 rounded-3xl p-5 md:p-6 shadow-sm lg:col-span-2 text-white relative flex flex-col hover:shadow-md transition-shadow"
+          className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200/60 lg:col-span-2 relative flex flex-col hover:shadow-md transition-shadow"
         >
           <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none -z-0">
-            <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl"></div>
+            <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50/60 rounded-full blur-3xl"></div>
           </div>
-          <h2 className="text-[17px] font-bold text-white mb-6 flex items-center gap-3">
-            <div className="bg-slate-800 p-2 rounded-lg border border-slate-700">
-               <Calendar size={16} className="text-indigo-400" />
+          <h2 className="text-[17px] font-bold text-slate-800 mb-6 flex items-center gap-3">
+            <div className="bg-indigo-50 p-2 rounded-lg">
+               <Calendar size={16} className="text-indigo-600" />
             </div>
             执行流 (今日)
           </h2>
           
-          <div className="relative pl-5 space-y-6 flex-1 before:absolute before:inset-y-2 before:left-[9px] before:w-px before:bg-slate-800">
+          <div className="relative pl-5 space-y-6 flex-1 before:absolute before:inset-y-2 before:left-[9px] before:w-px before:bg-slate-200">
             <div className="relative">
-              <div className="absolute left-[-23px] w-3.5 h-3.5 bg-indigo-500 rounded-full border-[3px] border-slate-900 ring-2 ring-indigo-500/30 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
-              <div className="text-[12px] text-indigo-300 font-bold mb-0.5 tracking-widest uppercase">执行中 (10:00 - 11:30)</div>
-              <div className="text-[15px] font-bold text-white tracking-wide">专业课 强化训练</div>
-              <div className="text-[13px] text-slate-400 mt-1 font-medium line-clamp-1">图的历年真题选做</div>
+              <div className="absolute left-[-23px] w-3.5 h-3.5 bg-indigo-500 rounded-full border-[3px] border-white ring-2 ring-indigo-500/30 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
+              <div className="text-[12px] text-indigo-600 font-bold mb-0.5 tracking-widest uppercase">执行中 (10:00 - 11:30)</div>
+              <div className="text-[15px] font-bold text-slate-900 tracking-wide">专业课 强化训练</div>
+              <div className="text-[13px] text-slate-500 mt-1 font-medium line-clamp-1">图的历年真题选做</div>
             </div>
             
-            <div className="relative opacity-60 hover:opacity-100 transition-opacity">
-              <div className="absolute left-[-22px] w-2.5 h-2.5 bg-slate-600 rounded-full border-2 border-slate-900" />
+            <div className="relative opacity-70 hover:opacity-100 transition-opacity">
+              <div className="absolute left-[-22px] w-2.5 h-2.5 bg-slate-300 rounded-full border-2 border-white" />
               <div className="text-[12px] text-slate-400 mb-0.5 font-bold tracking-widest uppercase">空闲区块 (14:00 - 17:00)</div>
-              <div className="text-[15px] font-bold text-slate-200">无硬性日程绑定</div>
+              <div className="text-[15px] font-bold text-slate-600">无硬性日程绑定</div>
             </div>
 
-            <div className="relative opacity-90">
-              <div className="absolute left-[-22px] w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-900 shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
+            <div className="relative">
+              <div className="absolute left-[-22px] w-3 h-3 bg-emerald-500 rounded-full border-2 border-white shadow-[0_0_8px_rgba(16,185,129,0.3)]" />
               <div className="flex items-center gap-2 mb-0.5">
-                 <div className="text-[12px] text-slate-300 font-bold tracking-widest uppercase">编排槽位 (19:00开始)</div>
+                 <div className="text-[12px] text-emerald-700 font-bold tracking-widest uppercase">编排槽位 (19:00 开始)</div>
               </div>
-              <div className="text-[15px] font-bold text-slate-100 mb-1.5">数据库原理上机实验</div>
-              <span className="text-[11px] text-emerald-300 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+              <div className="text-[15px] font-bold text-slate-800 mb-1.5">数据库原理上机实验</div>
+              <span className="text-[11px] text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
                  已建议调剂至此
               </span>
             </div>

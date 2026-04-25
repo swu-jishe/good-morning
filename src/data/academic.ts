@@ -47,7 +47,7 @@ export const GPA_BY_SEMESTER: { label: string; value: number }[] = [
 ];
 
 export const CURRENT_GPA = 3.82;
-export const GPA_RANK_PERCENT = 8;
+export const TARGET_GPA = 3.9;
 
 export const CREDIT_CATEGORIES: CreditCategory[] = [
   { label: '专业必修', earned: 52, required: 64, color: 'bg-indigo-500' },

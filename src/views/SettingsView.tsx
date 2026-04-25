@@ -1,71 +1,112 @@
 import { motion, AnimatePresence } from 'motion/react';
-import { Plus, ExternalLink, RefreshCw, Globe, Rss, Link2, BellRing, Database, ArrowLeft, ArrowUpRight, AlertCircle } from 'lucide-react';
+import { Plus, ExternalLink, RefreshCw, Globe, Rss, Link2, BellRing, Database, ArrowLeft, ArrowUpRight, AlertCircle, Zap } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { useState } from 'react';
 import SkillCard from '../components/SkillCard';
 import { SKILLS } from '../data/skills';
 
+interface SourceItem {
+  id: number;
+  name: string;
+  domain: string;
+  url: string;
+  status: 'active' | 'warning';
+  lastSync: string;
+  icon: typeof Globe;
+  color: string;
+  bg: string;
+  total: number;
+  latestRaw: string;
+  items: { title: string; date: string; url: string }[];
+}
+
+const SOURCE_RESEARCH: SourceItem = {
+  id: 1,
+  name: '研招网与目标院校信息',
+  domain: 'yz.chsi.com.cn',
+  url: 'https://yz.chsi.com.cn/',
+  status: 'active',
+  lastSync: '10 分钟前',
+  icon: Globe,
+  color: 'text-indigo-600',
+  bg: 'bg-indigo-50',
+  total: 34,
+  latestRaw: '关于做好2026年硕士研究生招生考试网上报名...',
+  items: [
+    { title: '2026年全国硕士研究生招生工作管理规定', date: '2025-09-15', url: 'https://yz.chsi.com.cn/kyzx/zcdh/202509/20250915/2293121111.html' },
+    { title: '南京大学2026年硕士研究生招生章程', date: '2025-09-20', url: 'https://grawww.nju.edu.cn/' },
+    { title: '网报信息确认入口开放通知', date: '2025-10-20', url: 'https://yz.chsi.com.cn/kyzx/kydt/202510/20251020/2293155555.html' },
+  ],
+};
+
+const SOURCE_CS_JW: SourceItem = {
+  id: 2,
+  name: '计算机学院教务通知公告',
+  domain: 'cs.nju.edu.cn/jw/',
+  url: 'https://cs.nju.edu.cn/',
+  status: 'active',
+  lastSync: '1 小时前',
+  icon: Rss,
+  color: 'text-emerald-600',
+  bg: 'bg-emerald-50',
+  total: 128,
+  latestRaw: '[10/22] 提醒：数据库原理上机实验安排调整...',
+  items: [
+    { title: '[10/22] 提醒：数据库原理上机实验安排调整', date: '昨天 19:30', url: 'https://cs.nju.edu.cn' },
+    { title: '2025-2026学年第一学期期末考试预通知', date: '10-15', url: 'https://cs.nju.edu.cn' },
+    { title: '关于举办"网络安全防护分析"专家讲座的通知', date: '10-10', url: 'https://cs.nju.edu.cn' },
+  ],
+};
+
+const SOURCE_CHAOXING_NEW: SourceItem = {
+  id: 3,
+  name: '超星学习通课程作业抓取',
+  domain: 'i.chaoxing.com',
+  url: 'https://i.chaoxing.com/',
+  status: 'warning',
+  lastSync: '刚刚',
+  icon: Link2,
+  color: 'text-amber-600',
+  bg: 'bg-amber-50',
+  total: 15,
+  latestRaw: '《计算机网络》实验四提交提醒 (未完成)',
+  items: [
+    { title: '《计算机网络》实验四提交提醒', date: '昨天 10:00', url: 'https://i.chaoxing.com/' },
+    { title: '《数据结构》期中测验成绩发布', date: '10-20', url: 'https://i.chaoxing.com/' },
+    { title: '《机器学习》第三章随堂测验', date: '10-18', url: 'https://i.chaoxing.com/' },
+  ],
+};
+
+const RESEARCH_UPDATED: Partial<SourceItem> = {
+  latestRaw: '[10/23 刚刚] 研招网发布考场最终分配名单与入场须知，需在 10/25 17:00 前完成确认',
+  total: 36,
+  lastSync: '刚刚',
+};
+
 export default function SettingsView() {
   const [selectedSourceId, setSelectedSourceId] = useState<number | null>(null);
+  const [sources, setSources] = useState<SourceItem[]>([SOURCE_RESEARCH, SOURCE_CS_JW]);
+  const [lastFetchTime, setLastFetchTime] = useState('3 分钟前');
+  const [isFetching, setIsFetching] = useState(false);
+  const [highlightedSourceId, setHighlightedSourceId] = useState<number | null>(null);
 
-  const sources = [
-    { 
-      id: 1, 
-      name: '研招网与目标院校信息', 
-      domain: 'yz.chsi.com.cn', 
-      url: 'https://yz.chsi.com.cn/',
-      status: 'active', 
-      lastSync: '10 分钟前', 
-      icon: Globe, 
-      color: 'text-indigo-600', 
-      bg: 'bg-indigo-50', 
-      total: 34,
-      latestRaw: '关于做好2026年硕士研究生招生考试网上报名...',
-      items: [
-        { title: '2026年全国硕士研究生招生工作管理规定', date: '2025-09-15', url: 'https://yz.chsi.com.cn/kyzx/zcdh/202509/20250915/2293121111.html' },
-        { title: '南京大学2026年硕士研究生招生章程', date: '2025-09-20', url: 'https://grawww.nju.edu.cn/' },
-        { title: '网报信息确认入口开放通知', date: '2025-10-20', url: 'https://yz.chsi.com.cn/kyzx/kydt/202510/20251020/2293155555.html' },
-      ]
-    },
-    { 
-      id: 2, 
-      name: '计算机学院教务通知公告', 
-      domain: 'cs.nju.edu.cn/jw/', 
-      url: 'https://cs.nju.edu.cn/',
-      status: 'active', 
-      lastSync: '1 小时前', 
-      icon: Rss, 
-      color: 'text-emerald-600', 
-      bg: 'bg-emerald-50', 
-      total: 128,
-      latestRaw: '[10/22] 提醒：数据库原理上机实验安排调整...',
-      items: [
-        { title: '[10/22] 提醒：数据库原理上机实验安排调整', date: '昨天 19:30', url: 'https://cs.nju.edu.cn' },
-        { title: '2025-2026学年第一学期期末考试预通知', date: '10-15', url: 'https://cs.nju.edu.cn' },
-        { title: '关于举办"网络安全防护分析"专家讲座的通知', date: '10-10', url: 'https://cs.nju.edu.cn' },
-      ]
-    },
-    { 
-      id: 3, 
-      name: '超星学习通课程作业抓取', 
-      domain: 'i.chaoxing.com', 
-      url: 'https://i.chaoxing.com/',
-      status: 'warning', 
-      lastSync: '昨天 14:00', 
-      icon: Link2, 
-      color: 'text-amber-600', 
-      bg: 'bg-amber-50', 
-      total: 15,
-      latestRaw: '《计算机网络》实验四提交提醒 (未完成)',
-      items: [
-        { title: '《计算机网络》实验四提交提醒', date: '昨天 10:00', url: 'https://i.chaoxing.com/' },
-        { title: '《数据结构》期中测验成绩发布', date: '10-20', url: 'https://i.chaoxing.com/' },
-        { title: '《机器学习》第三章随堂测验', date: '10-18', url: 'https://i.chaoxing.com/' },
-      ]
-    }
-  ];
+  const selectedSource = sources.find((s) => s.id === selectedSourceId);
 
-  const selectedSource = sources.find(s => s.id === selectedSourceId);
+  const handleFetch = () => {
+    if (isFetching) return;
+    setIsFetching(true);
+    window.setTimeout(() => {
+      setSources((prev) => {
+        const updatedResearch: SourceItem = { ...prev[0], ...RESEARCH_UPDATED };
+        const rest = prev.slice(1);
+        return [updatedResearch, ...rest, SOURCE_CHAOXING_NEW];
+      });
+      setLastFetchTime('刚刚');
+      setIsFetching(false);
+      setHighlightedSourceId(SOURCE_RESEARCH.id);
+      window.setTimeout(() => setHighlightedSourceId(null), 6000);
+    }, 4000);
+  };
 
   return (
     <div className="h-full flex flex-col w-full relative">
@@ -90,28 +131,66 @@ export default function SettingsView() {
 
             <div className="flex-1 overflow-y-auto space-y-10 pb-10 pr-2">
               <section>
-                <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center justify-between mb-5 gap-3 flex-wrap">
                   <div className="flex items-center gap-2">
                     <Database size={18} className="text-indigo-600" />
                     <h2 className="text-lg font-bold text-slate-800">已连接的原始信息源</h2>
+                    <span className="ml-1 text-[11px] font-semibold text-slate-500 bg-slate-100 px-2 py-0.5 rounded-full">
+                      已接入 {sources.length} 节点
+                    </span>
                   </div>
-                  <span className="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
-                    共接入 {sources.length} 个节点
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[12px] font-semibold text-slate-500 flex items-center gap-1.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      上次自动抓取：{lastFetchTime}
+                    </span>
+                    <button
+                      onClick={handleFetch}
+                      disabled={isFetching}
+                      className={cn(
+                        'inline-flex items-center gap-1.5 text-[12px] font-bold px-3 py-1.5 rounded-xl transition-all active:scale-[0.97] border',
+                        isFetching
+                          ? 'bg-indigo-50 text-indigo-400 border-indigo-100 cursor-wait'
+                          : 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700 shadow-sm shadow-indigo-200',
+                      )}
+                    >
+                      <RefreshCw
+                        size={13}
+                        className={cn('shrink-0', isFetching && 'animate-spin')}
+                      />
+                      {isFetching ? '抓取中 …' : '立即抓取'}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                  <AnimatePresence initial={false}>
                   {sources.map((source) => (
                     <motion.div
                       key={source.id}
+                      layout
+                      initial={{ opacity: 0, scale: 0.92 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.92 }}
+                      transition={{ duration: 0.35 }}
                       whileHover={{ y: -2 }}
-                      className="bg-white border border-slate-200 rounded-3xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col group relative overflow-hidden"
+                      className={cn(
+                        'bg-white border rounded-3xl p-5 shadow-sm hover:shadow-md transition-all flex flex-col group relative overflow-hidden',
+                        highlightedSourceId === source.id
+                          ? 'border-indigo-300 ring-4 ring-indigo-100'
+                          : 'border-slate-200',
+                      )}
                     >
                       <div className="flex justify-between items-start mb-4">
                         <div className={cn("w-10 h-10 rounded-2xl flex items-center justify-center shrink-0", source.bg, source.color)}>
                           <source.icon size={20} />
                         </div>
                         <div className="flex items-center gap-2">
+                          {highlightedSourceId === source.id && (
+                            <span className="flex items-center gap-1 text-[11px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded uppercase tracking-widest">
+                              <Zap size={10} />新抓取
+                            </span>
+                          )}
                           <span className="flex items-center gap-1.5 text-[13px] font-medium text-slate-500 bg-slate-50 px-2 py-1 rounded-lg">
                             <RefreshCw size={10} className={source.status === 'active' ? "text-emerald-500" : "text-amber-500"} />
                             {source.lastSync}
@@ -151,6 +230,7 @@ export default function SettingsView() {
                       </div>
                     </motion.div>
                   ))}
+                  </AnimatePresence>
 
                   {/* Add New Source Button */}
                   <motion.button
@@ -233,31 +313,31 @@ export default function SettingsView() {
                   </section>
 
                   {/* Exception Receipt Area */}
-                  <section className="bg-slate-900 rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden group">
-                     <div className="absolute -top-20 -right-20 w-48 h-48 bg-indigo-500/20 blur-3xl rounded-full pointer-events-none" />
+                  <section className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden group">
+                     <div className="absolute -top-20 -right-20 w-48 h-48 bg-indigo-50/60 blur-3xl rounded-full pointer-events-none" />
                      <div className="flex items-center gap-3 mb-4">
-                       <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white">
+                       <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">
                          <RefreshCw size={20} />
                        </div>
-                       <h2 className="text-lg font-bold text-white">异常控制与回执</h2>
+                       <h2 className="text-lg font-bold text-slate-800">异常控制与回执</h2>
                      </div>
                      
                      <div className="space-y-3 mt-6">
-                        <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                           <div className="text-[15px] font-bold text-slate-300">等待用户确认 (Pending)</div>
-                           <div className="w-16 h-1 bg-white/10 rounded-full overflow-hidden flex">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                           <div className="text-[15px] font-semibold text-slate-700">等待用户确认 (Pending)</div>
+                           <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden flex">
                               <div className="h-full bg-amber-400 w-1/2 animate-pulse" />
                            </div>
                         </div>
-                        <div className="flex items-center justify-between border-b border-white/10 pb-3 mt-1">
-                           <div className="text-[15px] font-bold text-slate-300">仅限建议不回写 (Read-Only)</div>
-                           <div className="w-16 h-1 bg-white/10 rounded-full overflow-hidden flex">
+                        <div className="flex items-center justify-between border-b border-slate-100 pb-3 mt-1">
+                           <div className="text-[15px] font-semibold text-slate-700">仅限建议不回写 (Read-Only)</div>
+                           <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden flex">
                               <div className="h-full bg-slate-400 w-full" />
                            </div>
                         </div>
                         <div className="flex items-center justify-between pt-1">
-                           <div className="text-[15px] font-bold text-slate-300">API 拉取断连 (Failed)</div>
-                           <div className="w-16 h-1 bg-white/10 rounded-full overflow-hidden flex">
+                           <div className="text-[15px] font-semibold text-slate-700">API 拉取断连 (Failed)</div>
+                           <div className="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden flex">
                               <div className="h-full bg-rose-500 w-1/4" />
                            </div>
                         </div>

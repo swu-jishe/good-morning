@@ -342,45 +342,45 @@ export default function ProfileView() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.2 }}
-          className="bg-slate-900 rounded-3xl p-6 relative overflow-hidden flex flex-col"
+          className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 relative overflow-hidden flex flex-col"
         >
-          <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/30 blur-2xl rounded-full pointer-events-none" />
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-50/80 blur-2xl rounded-full pointer-events-none" />
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-white">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
               <BrainCircuit size={18} />
             </div>
             <div>
-              <h3 className="font-bold text-white text-[17px] leading-tight">Agent 长期记忆摘要</h3>
-              <div className="text-[13px] text-slate-400 font-medium mt-0.5">跨 Agent 共享上下文</div>
+              <h3 className="font-bold text-slate-900 text-[17px] leading-tight">Agent 长期记忆摘要</h3>
+              <div className="text-[13px] text-slate-500 font-medium mt-0.5">跨 Agent 共享上下文</div>
             </div>
           </div>
 
           <div className="space-y-4 flex-1">
             <div>
-              <div className="text-[12px] font-semibold text-indigo-300 uppercase tracking-widest mb-2">学科偏好</div>
+              <div className="text-[12px] font-semibold text-indigo-600 uppercase tracking-widest mb-2">学科偏好</div>
               <div className="flex flex-wrap gap-1.5">
-                <span className="bg-white/10 border border-white/10 text-white/90 text-[13px] font-medium px-2 py-0.5 rounded-md">数学一</span>
-                <span className="bg-white/10 border border-white/10 text-white/90 text-[13px] font-medium px-2 py-0.5 rounded-md">英语一</span>
-                <span className="bg-white/10 border border-white/10 text-white/90 text-[13px] font-medium px-2 py-0.5 rounded-md">408 专业课</span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">数学一</span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">英语一</span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">408 专业课</span>
               </div>
             </div>
             <div>
-              <div className="text-[12px] font-semibold text-indigo-300 uppercase tracking-widest mb-2">行为规律</div>
+              <div className="text-[12px] font-semibold text-indigo-600 uppercase tracking-widest mb-2">行为规律</div>
               <div className="flex flex-wrap gap-1.5">
-                <span className="bg-white/10 border border-white/10 text-white/90 text-[13px] font-medium px-2 py-0.5 rounded-md">偏好夜间复习</span>
-                <span className="bg-white/10 border border-white/10 text-white/90 text-[13px] font-medium px-2 py-0.5 rounded-md">需强制番茄钟</span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">偏好夜间复习</span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">需强制番茄钟</span>
               </div>
             </div>
             <div>
-              <div className="text-[12px] font-semibold text-indigo-300 uppercase tracking-widest mb-2">个人特质</div>
+              <div className="text-[12px] font-semibold text-indigo-600 uppercase tracking-widest mb-2">个人特质</div>
               <div className="flex flex-wrap gap-1.5">
-                <span className="bg-white/10 border border-white/10 text-white/90 text-[13px] font-medium px-2 py-0.5 rounded-md">抗压能力中等</span>
-                <span className="bg-white/10 border border-white/10 text-white/90 text-[13px] font-medium px-2 py-0.5 rounded-md">对截止日敏感</span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">抗压能力中等</span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">对截止日敏感</span>
               </div>
             </div>
           </div>
 
-          <p className="mt-4 pt-4 border-t border-white/10 text-[13px] text-slate-400 leading-relaxed font-medium">
+          <p className="mt-4 pt-4 border-t border-slate-100 text-[13px] text-slate-500 leading-relaxed font-medium">
             上述标签由信息研判、日程规划、策略支持三个 Agent 在底层上下文共享，确保输出建议与个人特质拟合。
           </p>
         </motion.div>
