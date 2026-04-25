@@ -1,0 +1,57 @@
+import { EventItem } from '../types';
+
+export const INITIAL_EVENTS: EventItem[] = [
+  {
+    id: '1',
+    title: '南京大学研招网报名确认',
+    date: '10月25日',
+    time: '17:00 截止',
+    source: 'exam',
+    priority: 'high',
+    summary: '请登录学信网完成2026年硕士研究生招生考试网上报名信息的确认，逾期未确认将无法参加考试。',
+    actionRequired: '登录南大研招网系统',
+    url: 'https://yz.chsi.com.cn/',
+    writebackTimeline: [
+      { time: '今天 10:15', platform: 'agent', label: '研判 Agent 识别为 P0 风险', status: 'done', meta: 'judgment-agent · conf=0.98' },
+      { time: '今天 10:16', platform: 'agent', label: '规划 Agent 生成重排方案', status: 'done', meta: 'modification-card #mc-2304' },
+      { time: '今天 10:17', platform: 'user', label: '用户确认变更并授权回写', status: 'done', meta: '指纹二次校验通过' },
+      { time: '今天 10:17', platform: 'dingtalk', label: '已同步至钉钉日历', status: 'done', meta: 'ding-evt-8f2a1c' },
+      { time: '今天 10:17', platform: 'calendar', label: '已写入系统日历 (iCal)', status: 'done', meta: 'UID 20261025T170000Z' },
+      { time: '今天 10:17', platform: 'openclaw', label: '已创建 OpenClaw 执行任务', status: 'done', meta: 'task_id=oc-45211' },
+      { time: '10 月 25 日 16:30', platform: 'system', label: '等待提前 30 分钟强提醒触发', status: 'pending', meta: '触达方式：系统电话' },
+    ],
+  },
+  {
+    id: '2',
+    title: '《计算机网络》实验上机',
+    date: '10月23日',
+    time: '今天 19:00',
+    source: 'course',
+    priority: 'high',
+    summary: '实验四：TCP/IP 协议分析。需要在机房完成。',
+    actionRequired: '参加实验课',
+    url: 'https://i.chaoxing.com/',
+    writebackTimeline: [
+      { time: '昨天 21:00', platform: 'agent', label: '规划 Agent 从学习通抓取提交提醒', status: 'done' },
+      { time: '今天 08:00', platform: 'user', label: '用户确认按时参加', status: 'done' },
+      { time: '今天 08:00', platform: 'calendar', label: '已加入系统日历', status: 'done', meta: 'UID 20261023T190000Z' },
+      { time: '今天 18:30', platform: 'system', label: '待触发进入教室的地理围栏提醒', status: 'pending' },
+    ],
+  },
+  {
+    id: '3',
+    title: '蓝桥杯校内选拔赛报名',
+    date: '10月28日',
+    time: '全天',
+    source: 'competition',
+    priority: 'medium',
+    summary: '第十五届蓝桥杯全国软件和信息技术专业人才大赛校内选拔赛通知。',
+    actionRequired: '班群填写报名表',
+    url: 'https://dasai.lanqiao.cn/',
+    writebackTimeline: [
+      { time: '10 月 20 日', platform: 'agent', label: '研判 Agent 从竞赛站抓取结构化卡', status: 'done' },
+      { time: '10 月 20 日', platform: 'agent', label: '策略 Agent 判定与考研主线协调', status: 'active', meta: '建议优先级 P2' },
+      { time: '待定', platform: 'user', label: '等待用户确认是否报名', status: 'pending' },
+    ],
+  },
+];
