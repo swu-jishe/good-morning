@@ -2,7 +2,7 @@ import { motion } from 'motion/react';
 import {
   GraduationCap,
   TrendingUp,
-  Award,
+  Target,
   AlertTriangle,
   Info,
   BookOpen,
@@ -13,7 +13,7 @@ import { cn } from '../lib/utils';
 import {
   GPA_BY_SEMESTER,
   CURRENT_GPA,
-  GPA_RANK_PERCENT,
+  TARGET_GPA,
   CREDIT_CATEGORIES,
   ONGOING_COURSES,
   KNOWLEDGE_NODES,
@@ -41,7 +41,10 @@ function GpaCard() {
   const minValue = Math.min(...GPA_BY_SEMESTER.map((s) => s.value));
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full">
+    <div
+      data-pet-hint="当前 GPA 3.82，距离目标 3.90 还差 0.08，5 学期呈阶梯上升——继续保持！"
+      className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full hover:border-indigo-200 hover:shadow-md transition-all duration-300"
+    >
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
           <TrendingUp size={18} />
@@ -60,10 +63,10 @@ function GpaCard() {
         </div>
         <div className="text-sm text-slate-500 font-semibold pb-1">/ {maxGpa.toFixed(1)}</div>
         <div className="ml-auto text-right">
-          <div className="text-[12px] text-slate-400 font-bold uppercase tracking-wider">专业排名</div>
-          <div className="text-[15px] font-bold text-emerald-600 flex items-center gap-1 justify-end">
-            <Award size={12} />
-            前 {GPA_RANK_PERCENT}%
+          <div className="text-[12px] text-slate-400 font-semibold uppercase tracking-wider">距目标 {TARGET_GPA.toFixed(1)}</div>
+          <div className="text-[15px] font-bold text-indigo-600 flex items-center gap-1.5 justify-end tabular-nums">
+            <Target size={12} />
+            +{(TARGET_GPA - CURRENT_GPA).toFixed(2)}
           </div>
         </div>
       </div>
@@ -147,7 +150,10 @@ function CreditCard() {
   const circ = 2 * Math.PI * 36;
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full">
+    <div
+      data-pet-hint="学分进度 65%：专业课差 12 学分、通识还差 6 学分，Agent 已经帮你标出要补的方向了。"
+      className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full hover:border-emerald-200 hover:shadow-md transition-all duration-300"
+    >
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
           <GraduationCap size={18} />
@@ -219,7 +225,10 @@ function CreditCard() {
 
 function WarningCard() {
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full">
+    <div
+      data-pet-hint="学分预警：策略 Agent 建议下学期选《高级算法分析》+《科技史导论》两门，一次性补齐两个短板。"
+      className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full hover:border-amber-200 hover:shadow-md transition-all duration-300"
+    >
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
           <AlertTriangle size={18} />
@@ -262,13 +271,13 @@ function WarningCard() {
           </div>
         ))}
 
-        <div className="mt-auto p-3.5 rounded-2xl bg-slate-900 text-white flex gap-2.5 items-start">
-          <Sparkles size={14} className="shrink-0 mt-0.5 text-indigo-300" />
+        <div className="mt-auto p-3.5 rounded-2xl bg-indigo-50 border border-indigo-100 flex gap-2.5 items-start">
+          <Sparkles size={14} className="shrink-0 mt-0.5 text-indigo-600" />
           <div>
-            <div className="text-[12px] font-bold text-indigo-300 uppercase tracking-widest mb-0.5">
+            <div className="text-[12px] font-bold text-indigo-700 uppercase tracking-widest mb-0.5">
               Agent 建议
             </div>
-            <div className="text-[14px] font-bold leading-relaxed">
+            <div className="text-[14px] font-semibold leading-relaxed text-slate-800">
               下学期建议选《高级算法分析》+《科技史导论》，同时补齐通识学分与考研冲刺短板。
             </div>
           </div>
@@ -280,7 +289,10 @@ function WarningCard() {
 
 function OngoingCoursesTable() {
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6">
+    <div
+      data-pet-hint="本学期 5 门课：机器学习是高风险（随堂测验偏低），建议先抓这门；操作系统和软工稳定输出。"
+      className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 hover:border-violet-200 hover:shadow-md transition-all duration-300"
+    >
       <div className="flex items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center">
@@ -376,10 +388,13 @@ function KnowledgeTopology() {
   );
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6">
+    <div
+      data-pet-hint="知识点依赖图：绿节点已掌握，黄节点在学，灰节点未开始。从离散数学延伸到机器学习、分布式系统，是完整的计算机学习路径。"
+      className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 hover:border-indigo-200 hover:shadow-md transition-all duration-300"
+    >
       <div className="flex items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-slate-900 text-white flex items-center justify-center">
+          <div className="w-10 h-10 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center">
             <Network size={18} />
           </div>
           <div>

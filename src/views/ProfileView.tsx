@@ -110,7 +110,8 @@ export default function ProfileView() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 relative overflow-hidden group"
+        data-pet-hint="主干长期目标：2026 年南大软工，目标分 385+，距初试 248 天，当前胜率评估 62%。"
+        className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 relative overflow-hidden group hover:border-indigo-200 hover:shadow-md transition-all duration-300"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/40 rounded-bl-full rounded-tr-3xl -z-10 pointer-events-none" />
         <div className="flex items-start justify-between gap-4 mb-6">
@@ -176,7 +177,8 @@ export default function ProfileView() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.05 }}
-          className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 flex flex-col"
+          data-pet-hint="4 学科对照：专业课领先、数学符合、英语微落后、政治落后最严重。系统建议重点抓政治背诵。"
+          className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 flex flex-col hover:border-emerald-200 hover:shadow-md transition-all duration-300"
         >
           <div className="flex items-center justify-between gap-3 mb-5">
             <div className="flex items-center gap-3">
@@ -241,7 +243,8 @@ export default function ProfileView() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.1 }}
-          className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex flex-col"
+          data-pet-hint="多维能力雷达：6 维对比目标院校要求，红点是差距最大的维度——政治、英语、数学是重点突破方向。"
+          className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex flex-col hover:border-amber-200 hover:shadow-md transition-all duration-300"
         >
           <div className="flex items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-3">
@@ -269,7 +272,8 @@ export default function ProfileView() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.15 }}
-          className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 flex flex-col"
+          data-pet-hint="学业主线时间轴：已完成蓝桥国赛一等奖、暑期一轮、政治一轮，下一个里程碑是 10/25 的网报确认。"
+          className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 flex flex-col hover:border-rose-200 hover:shadow-md transition-all duration-300"
         >
           <div className="flex items-center justify-between gap-3 mb-6">
             <div className="flex items-center gap-3">
@@ -342,45 +346,46 @@ export default function ProfileView() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.2 }}
-          className="bg-slate-900 rounded-3xl p-6 relative overflow-hidden flex flex-col"
+          data-pet-hint="这是我记住的你：学科偏好、行为规律、个人特质。3 个 Agent 都会参考这些来给你个性化建议。"
+          className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 relative overflow-hidden flex flex-col hover:border-indigo-200 hover:shadow-md transition-all duration-300"
         >
-          <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-500/30 blur-2xl rounded-full pointer-events-none" />
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-50/80 blur-2xl rounded-full pointer-events-none" />
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-white">
+            <div className="w-10 h-10 rounded-2xl bg-indigo-50 flex items-center justify-center text-indigo-600">
               <BrainCircuit size={18} />
             </div>
             <div>
-              <h3 className="font-bold text-white text-[17px] leading-tight">Agent 长期记忆摘要</h3>
-              <div className="text-[13px] text-slate-400 font-medium mt-0.5">跨 Agent 共享上下文</div>
+              <h3 className="font-bold text-slate-900 text-[17px] leading-tight">Agent 长期记忆摘要</h3>
+              <div className="text-[13px] text-slate-500 font-medium mt-0.5">跨 Agent 共享上下文</div>
             </div>
           </div>
 
           <div className="space-y-4 flex-1">
             <div>
-              <div className="text-[12px] font-semibold text-indigo-300 uppercase tracking-widest mb-2">学科偏好</div>
+              <div className="text-[12px] font-semibold text-indigo-600 uppercase tracking-widest mb-2">学科偏好</div>
               <div className="flex flex-wrap gap-1.5">
-                <span className="bg-white/10 border border-white/10 text-white/90 text-[13px] font-medium px-2 py-0.5 rounded-md">数学一</span>
-                <span className="bg-white/10 border border-white/10 text-white/90 text-[13px] font-medium px-2 py-0.5 rounded-md">英语一</span>
-                <span className="bg-white/10 border border-white/10 text-white/90 text-[13px] font-medium px-2 py-0.5 rounded-md">408 专业课</span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">数学一</span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">英语一</span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">408 专业课</span>
               </div>
             </div>
             <div>
-              <div className="text-[12px] font-semibold text-indigo-300 uppercase tracking-widest mb-2">行为规律</div>
+              <div className="text-[12px] font-semibold text-indigo-600 uppercase tracking-widest mb-2">行为规律</div>
               <div className="flex flex-wrap gap-1.5">
-                <span className="bg-white/10 border border-white/10 text-white/90 text-[13px] font-medium px-2 py-0.5 rounded-md">偏好夜间复习</span>
-                <span className="bg-white/10 border border-white/10 text-white/90 text-[13px] font-medium px-2 py-0.5 rounded-md">需强制番茄钟</span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">偏好夜间复习</span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">需强制番茄钟</span>
               </div>
             </div>
             <div>
-              <div className="text-[12px] font-semibold text-indigo-300 uppercase tracking-widest mb-2">个人特质</div>
+              <div className="text-[12px] font-semibold text-indigo-600 uppercase tracking-widest mb-2">个人特质</div>
               <div className="flex flex-wrap gap-1.5">
-                <span className="bg-white/10 border border-white/10 text-white/90 text-[13px] font-medium px-2 py-0.5 rounded-md">抗压能力中等</span>
-                <span className="bg-white/10 border border-white/10 text-white/90 text-[13px] font-medium px-2 py-0.5 rounded-md">对截止日敏感</span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">抗压能力中等</span>
+                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">对截止日敏感</span>
               </div>
             </div>
           </div>
 
-          <p className="mt-4 pt-4 border-t border-white/10 text-[13px] text-slate-400 leading-relaxed font-medium">
+          <p className="mt-4 pt-4 border-t border-slate-100 text-[13px] text-slate-500 leading-relaxed font-medium">
             上述标签由信息研判、日程规划、策略支持三个 Agent 在底层上下文共享，确保输出建议与个人特质拟合。
           </p>
         </motion.div>

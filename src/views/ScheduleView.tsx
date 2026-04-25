@@ -180,7 +180,10 @@ export default function ScheduleView() {
 
       <div className="flex-1 flex flex-col md:flex-row gap-6 min-h-0">
         {/* Left Side: ALWAYS List merged with "This week's focus tasks" */}
-        <div className="w-full md:w-5/12 lg:w-1/3 flex flex-col bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden shrink-0">
+        <div
+          data-pet-hint="本周重点清单，按优先级排序。考研报名是 P0 最优先，点击任一条会在右侧展开详情。"
+          className="w-full md:w-5/12 lg:w-1/3 flex flex-col bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden shrink-0 hover:border-indigo-200 hover:shadow-md transition-all duration-300"
+        >
           <div className="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
             <span className="font-semibold text-slate-700 text-sm">本周重点清单</span>
             <button className="text-slate-400 hover:text-indigo-600 transition-colors p-1"><Filter size={16} /></button>
@@ -219,7 +222,10 @@ export default function ScheduleView() {
 
         {/* Right Side: detail view OR massive calendar */}
         {viewMode === 'detail' ? (
-          <div className="flex-1 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 flex flex-col relative overflow-hidden">
+          <div
+            data-pet-hint="任务详情页：往下滚能看到 OpenClaw 多平台联动时间线，Agent → 用户 → 钉钉 → 日历 → 执行队列 全链路可追踪。"
+            className="flex-1 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 flex flex-col relative overflow-hidden hover:border-indigo-200 hover:shadow-md transition-all duration-300"
+          >
             <div className="absolute -top-20 -right-20 w-64 h-64 bg-indigo-50/40 rounded-full blur-3xl pointer-events-none" />
 
             <motion.div 
@@ -315,7 +321,7 @@ export default function ScheduleView() {
           <motion.div 
             initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="flex-1 bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col overflow-hidden"
+            className="flex-1 bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col overflow-hidden hover:border-indigo-200 hover:shadow-md transition-all duration-300"
           >
             {/* Calendar Header */}
             <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">

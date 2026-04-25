@@ -17,7 +17,7 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
     { id: 'academic', label: '学业规划', icon: GraduationCap },
     { id: 'schedule', label: '日程编排', icon: CalendarDays },
     { id: 'profile', label: '成长档案', icon: BookOpen },
-    { id: 'settings', label: '订阅规则', icon: Settings },
+    { id: 'settings', label: '信息源与策略', icon: Settings },
   ] as const;
 
   return (
