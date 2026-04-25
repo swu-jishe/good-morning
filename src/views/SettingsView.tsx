@@ -4,6 +4,7 @@ import { cn } from '../lib/utils';
 import { useState } from 'react';
 import SkillCard from '../components/SkillCard';
 import { SKILLS } from '../data/skills';
+import { usePet } from '../context/PetContext';
 
 interface SourceItem {
   id: number;
@@ -84,6 +85,7 @@ const RESEARCH_UPDATED: Partial<SourceItem> = {
 };
 
 export default function SettingsView() {
+  const { speak: petSpeak, setThinking: petSetThinking } = usePet();
   const [selectedSourceId, setSelectedSourceId] = useState<number | null>(null);
   const [sources, setSources] = useState<SourceItem[]>([SOURCE_RESEARCH, SOURCE_CS_JW]);
   const [lastFetchTime, setLastFetchTime] = useState('3 分钟前');
@@ -95,6 +97,7 @@ export default function SettingsView() {
   const handleFetch = () => {
     if (isFetching) return;
     setIsFetching(true);
+    petSetThinking(true);
     window.setTimeout(() => {
       setSources((prev) => {
         const updatedResearch: SourceItem = { ...prev[0], ...RESEARCH_UPDATED };
@@ -104,6 +107,7 @@ export default function SettingsView() {
       setLastFetchTime('刚刚');
       setIsFetching(false);
       setHighlightedSourceId(SOURCE_RESEARCH.id);
+      petSpeak('扫完啦！研招网多了 2 条新动态，还自动接入了超星学习通 ✨', 6000);
       window.setTimeout(() => setHighlightedSourceId(null), 6000);
     }, 4000);
   };
@@ -130,7 +134,7 @@ export default function SettingsView() {
             </header>
 
             <div className="flex-1 overflow-y-auto space-y-10 pb-10 pr-2">
-              <section>
+              <section data-pet-hint="信息源接入区：默认 2 个数据源（研招网+教务），点「立即抓取」能看到研招网更新 + 新接入学习通的效果。">
                 <div className="flex items-center justify-between mb-5 gap-3 flex-wrap">
                   <div className="flex items-center gap-2">
                     <Database size={18} className="text-indigo-600" />
@@ -147,6 +151,8 @@ export default function SettingsView() {
                     <button
                       onClick={handleFetch}
                       disabled={isFetching}
+                      data-pet-hint="点我一下，我帮你去扫所有信息源，看看有没有新动态～"
+                      data-pet-hint-delay="1500"
                       className={cn(
                         'inline-flex items-center gap-1.5 text-[12px] font-bold px-3 py-1.5 rounded-xl transition-all active:scale-[0.97] border',
                         isFetching
@@ -249,7 +255,10 @@ export default function SettingsView() {
                 </div>
               </section>
 
-              <section className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden mb-6">
+              <section
+                data-pet-hint="Skill 能力手册：遵循 Anthropic Agent Skills 规范，每个 Skill 都有输入/输出/约束/异常回执，杜绝参数幻觉。"
+                className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden mb-6 hover:border-indigo-200 hover:shadow-md transition-all duration-300"
+              >
                  <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
                    <Database size={100} />
                  </div>
@@ -284,7 +293,10 @@ export default function SettingsView() {
 
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-20">
                   {/* Reminder Strategy */}
-                  <section className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm">
+                  <section
+                    data-pet-hint="高优预警触发规则：死线前 48 小时自动进入阻断流，最高触达方式是系统电话呼叫。"
+                    className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm hover:border-amber-200 hover:shadow-md transition-all duration-300"
+                  >
                      <div className="flex items-center gap-3 mb-6">
                        <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center text-amber-600">
                          <BellRing size={20} />
@@ -313,7 +325,10 @@ export default function SettingsView() {
                   </section>
 
                   {/* Exception Receipt Area */}
-                  <section className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden group">
+                  <section
+                    data-pet-hint="异常控制：3 种状态——等待用户确认、仅建议不回写、API 拉取断连。Agent 有问题前端第一时间能看到。"
+                    className="bg-white border border-slate-200 rounded-3xl p-6 md:p-8 shadow-sm relative overflow-hidden group hover:border-indigo-200 hover:shadow-md transition-all duration-300"
+                  >
                      <div className="absolute -top-20 -right-20 w-48 h-48 bg-indigo-50/60 blur-3xl rounded-full pointer-events-none" />
                      <div className="flex items-center gap-3 mb-4">
                        <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600">

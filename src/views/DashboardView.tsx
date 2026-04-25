@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { cn } from '../lib/utils';
 import WorkflowVisualizer from '../components/WorkflowVisualizer';
 import { PageType } from '../types';
+import { usePet } from '../context/PetContext';
 
 interface DashboardViewProps {
   onNavigate?: (page: PageType, focusEventId?: string) => void;
@@ -12,6 +13,7 @@ interface DashboardViewProps {
 export default function DashboardView({ onNavigate }: DashboardViewProps) {
   const [dragActive, setDragActive] = useState(false);
   const dragOccurredRef = useRef(false);
+  const { speak: petSpeak } = usePet();
 
   return (
     <div className="h-full flex flex-col w-full">
@@ -30,7 +32,8 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         {/* Card: Task Understanding */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-          className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200/60 lg:col-span-3 flex flex-col group hover:shadow-md transition-all duration-300 relative"
+          data-pet-hint="高优预警区。研判 Agent 已清洗 12 条动态，现在有 1 条阻断级风险——考研报名死线。可以点击或拖到右侧 Agent 抽屉编排。"
+          className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200/60 lg:col-span-3 flex flex-col group hover:border-indigo-200 hover:shadow-md transition-all duration-300 relative"
         >
           <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-50/40 rounded-bl-full rounded-tr-3xl -z-10 pointer-events-none" />
           
@@ -65,6 +68,8 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
              <div 
                 role="button"
                 tabIndex={0}
+                data-pet-hint="这条是考研报名死线，漏掉就无法参加考试！可以单击看详情，或直接拖到右侧 Agent 抽屉编排～"
+                data-pet-hint-delay="1500"
                 className={cn(
                   "border-[1.5px] border-dashed p-4 rounded-2xl flex flex-col gap-2 relative group/card transition-all cursor-grab active:cursor-grabbing shadow-sm",
                   dragActive
@@ -75,6 +80,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
                 onDragStart={() => {
                   setDragActive(true);
                   dragOccurredRef.current = true;
+                  petSpeak('P0 死线！我跟你一起过去 Agent 抽屉，让规划 Agent 帮你重排～', 4000);
                 }}
                 onDragEnd={() => {
                   setDragActive(false);
@@ -126,7 +132,8 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         {/* Card: Collaborative Decision (single-column full workflow) */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
-          className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200/60 lg:col-span-3 flex flex-col hover:shadow-md transition-all duration-300 relative"
+          data-pet-hint="协同决策网：三个子 Agent 并行处理冲突，主控裁决后输出推荐动作——这就是报告里的多智能体协同工作流。"
+          className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200/60 lg:col-span-3 flex flex-col hover:border-emerald-200 hover:shadow-md transition-all duration-300 relative"
         >
           <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-50/40 rounded-bl-full rounded-tr-3xl -z-10 pointer-events-none" />
           <div className="flex items-center justify-between gap-3 mb-4">
@@ -165,7 +172,8 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         {/* Timeline Card */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.15 }}
-          className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200/60 lg:col-span-2 relative flex flex-col hover:shadow-md transition-shadow"
+          data-pet-hint="今日执行流：上午执行中是专业课强化，晚上 19:00 是 Agent 刚帮你排过的计网实验。"
+          className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200/60 lg:col-span-2 relative flex flex-col hover:border-indigo-200 hover:shadow-md transition-all duration-300"
         >
           <div className="absolute inset-0 rounded-3xl overflow-hidden pointer-events-none -z-0">
             <div className="absolute top-0 right-0 w-48 h-48 bg-indigo-50/60 rounded-full blur-3xl"></div>
@@ -207,6 +215,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         {/* Profile Summary Card */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
+          data-pet-hint="核心成长档案：主干目标 2026 双一流初试，强化期进度 45%，细节在成长档案页。"
           className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200/60 lg:col-span-2 flex flex-col hover:border-amber-200 hover:shadow-md transition-all group relative overflow-hidden"
         >
            <div className="absolute top-0 right-0 p-5 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -244,6 +253,7 @@ export default function DashboardView({ onNavigate }: DashboardViewProps) {
         {/* Global Context Card */}
         <motion.div 
           initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.25 }}
+          data-pet-hint="系统正在监控的信息源：研招网实时截获、学习通按课表轮询，出了动静会立刻提醒你。"
           className="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-slate-200/60 lg:col-span-2 flex flex-col hover:border-violet-200 hover:shadow-md transition-all group relative"
         >
            <div className="flex items-center gap-3 mb-5">

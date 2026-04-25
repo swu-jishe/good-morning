@@ -41,7 +41,10 @@ function GpaCard() {
   const minValue = Math.min(...GPA_BY_SEMESTER.map((s) => s.value));
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full">
+    <div
+      data-pet-hint="当前 GPA 3.82，距离目标 3.90 还差 0.08，5 学期呈阶梯上升——继续保持！"
+      className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full hover:border-indigo-200 hover:shadow-md transition-all duration-300"
+    >
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
           <TrendingUp size={18} />
@@ -147,7 +150,10 @@ function CreditCard() {
   const circ = 2 * Math.PI * 36;
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full">
+    <div
+      data-pet-hint="学分进度 65%：专业课差 12 学分、通识还差 6 学分，Agent 已经帮你标出要补的方向了。"
+      className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full hover:border-emerald-200 hover:shadow-md transition-all duration-300"
+    >
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
           <GraduationCap size={18} />
@@ -219,7 +225,10 @@ function CreditCard() {
 
 function WarningCard() {
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full">
+    <div
+      data-pet-hint="学分预警：策略 Agent 建议下学期选《高级算法分析》+《科技史导论》两门，一次性补齐两个短板。"
+      className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full hover:border-amber-200 hover:shadow-md transition-all duration-300"
+    >
       <div className="flex items-center gap-3 mb-4">
         <div className="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
           <AlertTriangle size={18} />
@@ -280,7 +289,10 @@ function WarningCard() {
 
 function OngoingCoursesTable() {
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6">
+    <div
+      data-pet-hint="本学期 5 门课：机器学习是高风险（随堂测验偏低），建议先抓这门；操作系统和软工稳定输出。"
+      className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 hover:border-violet-200 hover:shadow-md transition-all duration-300"
+    >
       <div className="flex items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center">
@@ -376,7 +388,10 @@ function KnowledgeTopology() {
   );
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6">
+    <div
+      data-pet-hint="知识点依赖图：绿节点已掌握，黄节点在学，灰节点未开始。从离散数学延伸到机器学习、分布式系统，是完整的计算机学习路径。"
+      className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 hover:border-indigo-200 hover:shadow-md transition-all duration-300"
+    >
       <div className="flex items-center justify-between gap-3 mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center">

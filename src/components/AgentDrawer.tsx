@@ -4,6 +4,7 @@ import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { useState, useEffect, useRef, type DragEvent, type MouseEvent as ReactMouseEvent } from 'react';
 import { useSchedule } from '../context/ScheduleContext';
+import { usePet } from '../context/PetContext';
 
 interface Citation {
   id: number;
@@ -29,7 +30,7 @@ interface Message {
   modificationCard?: ModificationCard;
 }
 
-const MOCK_RESPONSES: Record<string, {text: string, agentId: AgentType, citations?: Citation[], modificationCard?: ModificationCard}> = {
+const MOCK_RESPONSES: Record<string, {text: string, agentId: AgentType, citations?: Citation[], modificationCard?: ModificationCard, petSummary?: string}> = {
   // Judgment Agent
   '解读今日高优预警': {
     agentId: 'judgment',
@@ -37,18 +38,21 @@ const MOCK_RESPONSES: Record<string, {text: string, agentId: AgentType, citation
     citations: [
       { id: 1, title: '南大研招网系统通知', summary: '官方通知：2026年硕士招生信息确认时间点及在线提交流程更新。', url: 'https://yz.chsi.com.cn' },
       { id: 2, title: '教务通 - 计网作业', summary: '实验四：TCP/IP 协议分析作业详情及机房准入要求。', url: 'https://i.chaoxing.com/' }
-    ]
+    ],
+    petSummary: '今天有 2 条高优警告，研招网和计网实验都要抓紧～',
   },
   '总结近期院校通知': {
     agentId: 'judgment',
     text: '为你追踪了近3天的高频异动信息：\n目标院校的考点安排公告已正式张贴。同时校内保研政策进行了局部微调，剔除了四级成绩的基础强制要求。\n已在信息池为你自动收录并打标。',
     citations: [
       { id: 1, title: '南京大学研究生院公告', summary: '关于2026届考点安排和考场指令的最新通报文件。', url: '#' }
-    ]
+    ],
+    petSummary: '近期 2 条院校通知，考点和保研政策都有更新哦！',
   },
   '过滤低迷信息': {
     agentId: 'judgment',
-    text: '已自动执行去噪算法。屏蔽了考研超话中的 45 条贩卖焦虑贴，以及屏蔽了二手书转让无效发帖。你的信息主池已恢复洁净。'
+    text: '已自动执行去噪算法。屏蔽了考研超话中的 45 条贩卖焦虑贴，以及屏蔽了二手书转让无效发帖。你的信息主池已恢复洁净。',
+    petSummary: '帮你屏蔽了 45 条焦虑贴，专注冲刺吧！',
   },
   
   // Planning Agent
@@ -64,7 +68,8 @@ const MOCK_RESPONSES: Record<string, {text: string, agentId: AgentType, citation
          { time: '刚刚', platform: 'user', label: '用户确认重排并授权回写', status: 'done', meta: 'modification-card #mc-2410' },
          { time: '刚刚', platform: 'openclaw', label: 'OpenClaw 已更新任务时间', status: 'done', meta: 'task_id=oc-45218' },
        ],
-    }
+    },
+    petSummary: '我把实验挪到今晚 19:00，周五就能安心网报啦～',
   },
   '推迟低优活动': {
     agentId: 'planning',
@@ -73,11 +78,13 @@ const MOCK_RESPONSES: Record<string, {text: string, agentId: AgentType, citation
        original: "公开课分享 (周四)",
        updated: "公开课分享 (下周一 14:00)",
        impact: "释放本周四 2 小时用作政治重点突破",
-    }
+    },
+    petSummary: '公开课挪到下周，周四可以冲政治！',
   },
   '为模拟考预留时间': {
     agentId: 'planning',
-    text: '好的，我已经为你锁定了周六下午 14:00 - 17:00 这个完整的3小时区块，期间会自动开启免打扰番茄钟引擎。'
+    text: '好的，我已经为你锁定了周六下午 14:00 - 17:00 这个完整的3小时区块，期间会自动开启免打扰番茄钟引擎。',
+    petSummary: '周六下午 14-17 点已锁定，记得免打扰哦！',
   },
 
   // Policy Agent
@@ -86,19 +93,22 @@ const MOCK_RESPONSES: Record<string, {text: string, agentId: AgentType, citation
     text: '结合你多维能力画像，数据结构已达标，但政治马原背诵落后进度 15%。我已经为你生成了一套追赶计划节点。',
     citations: [
       { id: 1, title: '阶段进展卡', summary: '基于当前 10 月强化冲刺期的指标进行对比换算。', url: '#' }
-    ]
+    ],
+    petSummary: '数据结构已达标，政治落后 15% 要追一追！',
   },
   '分析目标院校报录比': {
     agentId: 'policy',
     text: '双一流南大软工的最新统考竞争度情况，已被我整理成了图表报告卡：',
     citations: [
       { id: 1, title: '网报大数据监控版', summary: '系统抓取到预计报名人数有小幅上扬。', url: '#' },
-    ]
+    ],
+    petSummary: '南大软工报名人数略涨，我们继续稳住节奏～',
   },
   '推荐适合的复习资料': {
     agentId: 'policy',
-    text: '考虑到你倾向于夜间复习并存在数学短板，推荐使用《李林真题解析》来增强空间向量的计算硬度。'
-  }
+    text: '考虑到你倾向于夜间复习并存在数学短板，推荐使用《李林真题解析》来增强空间向量的计算硬度。',
+    petSummary: '推荐《李林真题解析》，补数学短板正合适！',
+  },
 };
 
 const CitationBlock = ({ citation }: { citation: Citation }) => {
@@ -183,6 +193,7 @@ const STORAGE_KEY = 'zhitu-agent-drawer-width';
 
 export default function AgentDrawer({ agentType }: AgentDrawerProps) {
   const { appendWriteback } = useSchedule();
+  const { speak: petSpeak, setThinking: petSetThinking, celebrate: petCelebrate } = usePet();
   const [activeAgents, setActiveAgents] = useState<AgentType[]>([agentType]);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
@@ -199,6 +210,7 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
     if (mod.affectedEventId && mod.writebackSteps && mod.writebackSteps.length > 0) {
       appendWriteback(mod.affectedEventId, mod.writebackSteps);
     }
+    petCelebrate('完美！已经帮你同步到日程时间线啦 ✨');
   };
 
   useEffect(() => {
@@ -317,6 +329,7 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
     setMessages(prev => [...prev, userMsg]);
     setInputText("");
     setIsTyping(true);
+    petSetThinking(true);
 
     // Contextual trigger for the drag-and-drop scenario
     if (text.includes('考研报名确认预期冲突')) {
@@ -330,8 +343,10 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
            agentId: 'judgment',
            text: '我已初步解析此冲突。研招网死线优先级为绝对高优(P0)，《计算机网络》实验为常规考核(P2)。建议立刻优先保底网报。\n\n已下发联动指令，请 @规划 Agent 介入排程。'
          }]);
+         petSpeak('发现死线冲突！研招网 P0 优先，交给规划 Agent～', 3500);
 
          setIsTyping(true);
+         petSetThinking(true);
 
          setTimeout(() => {
             setMessages(prev => [...prev, {
@@ -352,6 +367,7 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
               }
             }]);
             setIsTyping(false);
+            petSpeak('实验挪到今晚 19:00，等你点确认～', 5000);
          }, 2500);
 
        }, 1200);
@@ -360,6 +376,7 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
 
     setTimeout(() => {
       setIsTyping(false);
+      petSetThinking(false);
       let responseMatched = false;
       
       for (const [key, canned] of Object.entries(MOCK_RESPONSES)) {
@@ -377,6 +394,9 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
              citations: canned.citations,
              modificationCard: canned.modificationCard
            }]);
+           if (canned.petSummary) {
+             petSpeak(canned.petSummary, 5000);
+           }
            responseMatched = true;
            break;
         }
@@ -392,6 +412,7 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
              agentId: activeAgents[0],
              text: `目前已分配至联合处理流水线：\n\n${genericTeamResponse}`
          }]);
+         petSpeak('已交给协同流水线处理啦', 4000);
       }
     }, 1200); 
   };

@@ -110,7 +110,8 @@ export default function ProfileView() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 relative overflow-hidden group"
+        data-pet-hint="主干长期目标：2026 年南大软工，目标分 385+，距初试 248 天，当前胜率评估 62%。"
+        className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 relative overflow-hidden group hover:border-indigo-200 hover:shadow-md transition-all duration-300"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/40 rounded-bl-full rounded-tr-3xl -z-10 pointer-events-none" />
         <div className="flex items-start justify-between gap-4 mb-6">
@@ -176,7 +177,8 @@ export default function ProfileView() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.05 }}
-          className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 flex flex-col"
+          data-pet-hint="4 学科对照：专业课领先、数学符合、英语微落后、政治落后最严重。系统建议重点抓政治背诵。"
+          className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 flex flex-col hover:border-emerald-200 hover:shadow-md transition-all duration-300"
         >
           <div className="flex items-center justify-between gap-3 mb-5">
             <div className="flex items-center gap-3">
@@ -241,7 +243,8 @@ export default function ProfileView() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.1 }}
-          className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex flex-col"
+          data-pet-hint="多维能力雷达：6 维对比目标院校要求，红点是差距最大的维度——政治、英语、数学是重点突破方向。"
+          className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex flex-col hover:border-amber-200 hover:shadow-md transition-all duration-300"
         >
           <div className="flex items-center justify-between gap-3 mb-3">
             <div className="flex items-center gap-3">
@@ -269,7 +272,8 @@ export default function ProfileView() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.15 }}
-          className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 flex flex-col"
+          data-pet-hint="学业主线时间轴：已完成蓝桥国赛一等奖、暑期一轮、政治一轮，下一个里程碑是 10/25 的网报确认。"
+          className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 flex flex-col hover:border-rose-200 hover:shadow-md transition-all duration-300"
         >
           <div className="flex items-center justify-between gap-3 mb-6">
             <div className="flex items-center gap-3">
@@ -342,7 +346,8 @@ export default function ProfileView() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.2 }}
-          className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 relative overflow-hidden flex flex-col"
+          data-pet-hint="这是我记住的你：学科偏好、行为规律、个人特质。3 个 Agent 都会参考这些来给你个性化建议。"
+          className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 relative overflow-hidden flex flex-col hover:border-indigo-200 hover:shadow-md transition-all duration-300"
         >
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-50/80 blur-2xl rounded-full pointer-events-none" />
           <div className="flex items-center gap-3 mb-4">
