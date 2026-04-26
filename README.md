@@ -1,86 +1,91 @@
-# 知途（ZhiTu）Demo
+# 知途（ZhiTu）
 
-面向大学生学业规划、成长决策与任务协同场景的前端演示项目。
+面向大学生学业规划、成长决策与任务协同场景的前端项目。
 
-当前版本完整呈现 **5 主页面 + 常驻 Agent 抽屉 + 小知虚拟助手** 的产品闭环：从信息聚合 → 多智能体协同编排 → 用户确认 → 多平台回写 → 反馈可见，对应《作品报告》第三章四大关键技术（RAG 长期记忆、Skill 封装、多智能体协同工作流、OpenClaw 平台联动）的完整可视化。
+当前版本聚焦于学业规划、成长决策与任务协同场景的前端产品化表达，已完成页面结构、协同面板、流程可视化、能力分析与信息源管理等核心模块的统一设计与实现。
 
 ## 在线预览
 
-正式部署版本（推荐）：
+正式部署版本：
 
 > <https://good-morning-henna.vercel.app/>
 
-> 
+## 当前版本说明
 
-知途是一个用于比赛演示的前端 Demo，核心强调四件事：
+- **5 个主页面**：聚合工作台、学业规划、日程编排、成长档案、信息源与策略
+- **常驻协同面板**：按页面切换默认协同角色，保留输入区、配置区、可调宽抽屉等结构
+- **虚拟助手**：负责时间问候、页面摘要、模块 hover 提示与拖拽交互反馈
+- **集中内容层**：主要展示文案与统一内容配置由 `src/content/submissionContent.ts` 管理
+- **结构化产品界面**：聚焦信息聚合、策略说明、流程可视化与协同交互的一体化呈现
 
-- **信息聚合**：聚合竞赛、课程、考试、通知等多源信息
-- **任务协同**：通过 Multi-Agent（信息研判 / 日程规划 / 策略支持）对复杂信息进行理解、编排与确认回写
-- **成长主线**：通过成长档案页承接长期目标、阶段进展、多维能力画像与里程碑
-- **可感知的 Agent**：通过常驻"小知"虚拟助手把 Agent 思考、模块语义、行动反馈外显为肉眼可见的气泡和动画
-
-当前仓库为 **Vite + React + TypeScript** 的纯前端演示项目，所有数据为 mock，无真实后端依赖。
-
-## 当前页面结构
+## 页面结构
 
 按导航顺序：
 
-1. **聚合工作台**（Dashboard）：高优预警与任务理解、协同决策网（Agent Flow 可视化）、今日执行流、核心成长档案、系统上下文嗅探
-2. **学业规划**（Academic）：实时 GPA 测算、毕业学分进度、学分预警与选课建议、本学期在修课程、专业知识点拓扑图
-3. **日程编排**（Schedule）：本周重点清单、详情面板（含智能任务拆解 + OpenClaw 多平台联动时间线）、月视日历
-4. **成长档案**（Profile）：主干长期目标、四学科阶段进展、多维能力雷达（当前 vs 目标差距）、横向里程碑时间轴、Agent 长期记忆摘要
-5. **信息源与策略**（Settings）：信息源接入与"立即抓取"动效、Skill 能力手册（Anthropic Agent Skills 规范，每张卡可查看 .md 源文件）、提醒策略、异常控制与回执
+1. **聚合工作台**（Dashboard）
+   - 展示系统摘要、推荐动作、指标卡、时间线、成长档案摘要与协同流程入口
+2. **学业规划**（Academic）
+   - 展示 GPA、学分进度、课程状态、知识拓扑、能力雷达等学业分析结构
+3. **日程编排**（Schedule）
+   - 展示事项详情、月历视图、本地时间线与清单区域
+4. **成长档案**（Profile）
+   - 展示长期目标、阶段进展、里程碑与能力基线对照
+5. **信息源与策略**（Settings）
+   - 展示信息源状态、Skill 能力手册、提醒策略与异常状态说明
 
-并行能力：
+并行区域：
 
-- **常驻 Agent 抽屉**：跨页面存在，三个 Agent（研判 / 规划 / 策略）可多选；支持拖拽预警卡触发协同；ModCard 编排回写；左缘可拖拽调宽（288–640 px，宽度本地持久化）
-- **小知虚拟助手**：像素风形象，常驻左下角；提供时间问候、页面切换摘要、模块 hover 解释、Agent 思考态联动、ModCard 确认庆祝、立即抓取联动等多种气泡反馈；支持拖拽移动 + 5 连击彩蛋
+- **协同面板**：页面级协同角色切换、输入框、说明配置、键盘可访问抽屉缩放
+- **虚拟助手**：常驻左下角，负责问候、说明、提示和拖拽反馈
 
 ## 技术栈
 
 - React 19
-- TypeScript（strict）
+- TypeScript
 - Vite 6
 - Tailwind CSS 4
-- motion / motion/react（动画）
-- lucide-react（图标）
+- motion / motion/react
+- lucide-react
 
 ## 目录结构
 
 ```text
 project/
 ├─ public/
-│  └─ pet.png                       小知像素贴图
+│  └─ pet.png                         虚拟助手贴图资源
 ├─ src/
-│  ├─ App.tsx                       页面路由 + Provider 装载 + 响应式 padding + 全局 hover hint 监听
-│  ├─ main.tsx                      Vite 入口
-│  ├─ index.css                     Tailwind + 自定义 scrollbar
-│  ├─ types.ts                      PageType / AgentType / EventItem / WritebackStep / SkillDef 等类型
+│  ├─ App.tsx                         应用壳层、页面切换、Provider 装配、全局 hover hint
+│  ├─ main.tsx                        React / Vite 入口
+│  ├─ index.css                       全局样式与自定义滚动条
+│  ├─ types.ts                        PageType / AgentType / EventItem / SkillDef 等核心类型
+│  ├─ content/
+│  │  └─ submissionContent.ts         集中式展示内容配置
 │  ├─ components/
-│  │  ├─ Sidebar.tsx                左侧悬浮导航（5 项）
-│  │  ├─ AgentDrawer.tsx            抽屉 + ModCardBlock + CitationBlock + 可调宽
-│  │  ├─ WorkflowVisualizer.tsx     Agent Flow 4 层协同工作流（完整 / compact 两种模式）
-│  │  ├─ RadarChart.tsx             能力雷达 SVG（双层多边形 + 差距红点）
-│  │  ├─ SkillCard.tsx              Skill 卡 + .md 预览 Modal
-│  │  └─ PetMascot.tsx              小知虚拟助手（像素形象 + 气泡 + 动画 + 拖拽）
+│  │  ├─ Sidebar.tsx                  左侧导航
+│  │  ├─ AgentDrawer.tsx              常驻协同面板、配置层、可调宽抽屉
+│  │  ├─ WorkflowVisualizer.tsx       协同流程可视化（完整 / compact）
+│  │  ├─ RadarChart.tsx               能力雷达图组件
+│  │  ├─ SkillCard.tsx                Skill 说明卡片与详情弹窗
+│  │  └─ PetMascot.tsx                虚拟助手与气泡反馈
 │  ├─ context/
-│  │  ├─ ScheduleContext.tsx        全局事件 + writeback（编排回写闭环）
-│  │  └─ PetContext.tsx             小知气泡 / 思考 / 可见 / 庆祝
+│  │  ├─ ScheduleContext.tsx          日程选择、事项状态与时间线上下文
+│  │  └─ PetContext.tsx               助手气泡、可见性与交互反馈上下文
 │  ├─ data/
-│  │  ├─ events.ts                  事件初始数据（含 writebackTimeline）
-│  │  ├─ skills.ts                  4 项 Skill 完整定义（含 mdPreview）
-│  │  └─ academic.ts                GPA / 学分 / 课程 / 拓扑 / 雷达 mock
+│  │  ├─ academic.ts                  学业域内容适配导出
+│  │  ├─ events.ts                    日程域内容适配导出
+│  │  └─ skills.ts                    Skill 内容适配导出
 │  ├─ lib/
-│  │  └─ utils.ts                   cn() 工具
+│  │  ├─ scheduleCalendar.ts          由事件数据推导月历模型
+│  │  └─ utils.ts                     `cn()` 等通用工具
 │  └─ views/
-│     ├─ DashboardView.tsx          聚合工作台
-│     ├─ AcademicView.tsx           学业规划
-│     ├─ ScheduleView.tsx           日程编排
-│     ├─ ProfileView.tsx            成长档案
-│     └─ SettingsView.tsx           信息源与策略
-├─ docs/
-│  └─ superpowers/
-│     └─ specs/                     spec 迭代版本（YYYY-MM-DD-HHMM-<topic>.md）
+│     ├─ DashboardView.tsx            聚合工作台
+│     ├─ AcademicView.tsx             学业规划
+│     ├─ ScheduleView.tsx             日程编排
+│     ├─ ProfileView.tsx              成长档案
+│     └─ SettingsView.tsx             信息源与策略
+├─ skills/
+│  ├─ metadata.json                   Skill 元数据
+│  └─ SKILL.md                        Skill 说明
 ├─ .env.example
 ├─ index.html
 ├─ metadata.json
@@ -175,35 +180,25 @@ npm run clean    # 清理 dist 目录
 
 ## 环境变量说明
 
-仓库中提供 `.env.example`。当前前端演示页面本身以静态 mock 为主，默认启动流程**不依赖真实后端服务**。
+仓库中提供 `.env.example`。当前前端可以独立运行，后续如需接入服务端或外部能力，可按需要补充环境变量。
 
 示例变量包括：
 
 - `GEMINI_API_KEY`
 - `APP_URL`
 
-如果只是本地打开并演示当前页面，通常无需额外配置真实密钥。
+## 推荐查看顺序
 
-## 推荐演示链路
-
-完整 5–6 分钟演示脚本可参考 `docs/` 下相应说明，要点顺序：
-
-1. 进入 **聚合工作台**：小知自动问候 → 介绍 Bento 栅格 + Agent Flow 协同决策网
-2. **核心闭环**：拖拽高优预警卡到右侧 Agent 抽屉 → 小知主动解释 → 多 Agent 协同对话 → ModCard 出现 → 点击「确认变更并写入日程」 → 小知 360° 旋转庆祝
-3. 切到 **日程编排** 验证回写：OpenClaw 多平台联动时间线出现 3 条新步骤（带"新"脉冲徽章）
-4. **学业规划**：GPA 柱图（非零基线突出差异）、学分进度、知识点拓扑图依赖 DAG
-5. **成长档案**：长期目标 + 阶段进展四学科 + 雷达图差距分析 + 横向里程碑 + Agent 长期记忆摘要
-6. **信息源与策略**：点击「立即抓取」→ 小知思考 4 秒 → 新源接入 + 旧源更新 + indigo 高亮 → 翻 Skill 手册卡查看 `.md` 源文件
-7. 收尾：拖拽 Agent 抽屉调宽 → 拖拽小知到任意位置 → 5 连击触发彩蛋
-
-## 比赛说明
-
-- 当前项目以计算机设计大赛演示为目标
-- 强调前端产品感、交互叙事与页面闭环
-- `docs/superpowers/specs/` 下保存所有迭代版本的产品 spec，每份对应一个里程碑的"现在是什么样"
+1. 进入 **聚合工作台**，查看系统摘要、指标卡、推荐动作和协同流程
+2. 切换到 **学业规划**，查看 GPA、学分、课程、知识拓扑和能力雷达等分析模块
+3. 打开 **日程编排**，查看事项详情、月历视图和本地时间线在空数据时的展示策略
+4. 切换到 **成长档案**，查看长期目标、阶段进展、里程碑与能力基线
+5. 进入 **信息源与策略**，查看来源管理、Skill 手册、提醒规则与异常状态说明
+6. 观察右侧 **协同面板** 与左下角 **虚拟助手** 的常驻交互能力
 
 ## 备注
 
-- 当前已稳定为 **5 页面 + 抽屉 + 小知** 的最终形态
-- 所有数据均为前端 mock，无后端依赖；`.env` 文件并非必需
-- 如需扩展，参考 `docs/superpowers/specs/` 下最新的 spec 文档；新增组件按现有目录约定（`components/` / `views/` / `context/` / `data/`）放置
+- 当前分支的主要展示值统一收敛到 `src/content/submissionContent.ts`
+- `src/data/*` 负责把集中内容层适配为各模块消费的数据导出
+- `src/lib/scheduleCalendar.ts` 负责把事件数据转换为月历展示模型
+- 当前版本重点是稳定展示结构、页面协同关系与统一内容组织方式，可继续在现有基础上扩展服务端接入与业务数据流
