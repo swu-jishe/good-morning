@@ -1,4 +1,4 @@
-# 知途 Demo - 本地启动脚本
+﻿# 知途 Demo - 本地启动脚本
 # 用法: 右键此文件 → "使用 PowerShell 运行"，或在终端执行: .\start.ps1
 
 $ErrorActionPreference = "Stop"

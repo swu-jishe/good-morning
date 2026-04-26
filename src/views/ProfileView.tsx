@@ -2,7 +2,7 @@ import { Target, Milestone, Zap, BrainCircuit, ExternalLink, ChartCandlestick, F
 import { motion } from 'motion/react';
 import { cn } from '../lib/utils';
 import RadarChart from '../components/RadarChart';
-import { ABILITY_RADAR } from '../data/academic';
+import { submissionContent } from '../content/submissionContent';
 
 interface StageProgress {
   subject: string;
@@ -13,55 +13,11 @@ interface StageProgress {
   barPercent: number;
 }
 
-const STAGE_PROGRESS: StageProgress[] = [
-  {
-    subject: '专业课',
-    category: '数据结构与算法',
-    status: 'ahead',
-    delta: '领先 5%',
-    detail: '历年真题一刷完毕，错题率稳定 15% 内。图与树综合大题得分率显著提升。',
-    barPercent: 72,
-  },
-  {
-    subject: '数学',
-    category: '高等数学 + 线性代数',
-    status: 'on-track',
-    delta: '符合规划',
-    detail: '660 题第二轮进度 60%，线代两轮已过，概率论待开启。',
-    barPercent: 55,
-  },
-  {
-    subject: '英语',
-    category: '英语一',
-    status: 'behind',
-    delta: '落后 3%',
-    detail: '阅读正确率维稳 78%，作文仍需系统训练；近 5 年真题剩 2 套未做。',
-    barPercent: 48,
-  },
-  {
-    subject: '政治',
-    category: '主观题背诵',
-    status: 'severely-behind',
-    delta: '落后 15%',
-    detail: '马原原理解析准确率偏低，近代史主脉络记忆存在断层。已下发针对性背诵日程。',
-    barPercent: 32,
-  },
-];
-
 interface MilestoneItem {
   label: string;
   date: string;
   status: 'done' | 'next' | 'future';
 }
-
-const MILESTONES: MilestoneItem[] = [
-  { label: '蓝桥杯国赛一等奖', date: '2025 年 6 月', status: 'done' },
-  { label: '暑期专业课一轮', date: '2025 年 8 月', status: 'done' },
-  { label: '考研政治一轮过境', date: '2025 年 9 月', status: 'done' },
-  { label: '全国网报确认', date: '2025 年 10 月 25 日', status: 'next' },
-  { label: '考研初试', date: '2025 年 12 月 21 日', status: 'future' },
-  { label: '成绩公布 / 复试准备', date: '2026 年 2-3 月', status: 'future' },
-];
 
 const statusStyle: Record<
   StageProgress['status'],
@@ -98,11 +54,15 @@ const statusStyle: Record<
 };
 
 export default function ProfileView() {
+  const { overview, stageProgress, milestones, memorySections } = submissionContent.profile;
+  const progressMarkers = ['起步', '待同步（当前）', '分析', '更新'];
+  const abilityRadar = submissionContent.academic.abilityRadar;
+
   return (
     <div className="flex flex-col gap-6 pb-10">
       <header className="shrink-0">
         <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-2">成长档案</h1>
-        <p className="text-slate-500 font-medium">全局上下文与学习主线数据记录</p>
+        <p className="text-slate-500 font-medium">全局上下文与长期规划数据记录</p>
       </header>
 
       {/* Row 1: Long-term Goal (full width) */}
@@ -110,7 +70,7 @@ export default function ProfileView() {
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.35 }}
-        data-pet-hint="主干长期目标：2026 年南大软工，目标分 385+，距初试 248 天，当前胜率评估 62%。"
+        data-pet-hint="这里展示长期规划总览、阶段完成度和关键指标卡，当前暂无新的业务记录。"
         className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 relative overflow-hidden group hover:border-indigo-200 hover:shadow-md transition-all duration-300"
       >
         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50/40 rounded-bl-full rounded-tr-3xl -z-10 pointer-events-none" />
@@ -120,53 +80,42 @@ export default function ProfileView() {
               <Target size={22} />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-lg leading-tight">主干长期目标 · 2026 年双一流初试</h3>
-              <div className="text-xs font-medium text-slate-500 mt-0.5">由策略 Agent 持续护航</div>
+              <h3 className="font-bold text-slate-900 text-lg leading-tight">{overview.title}</h3>
+              <div className="text-xs font-medium text-slate-500 mt-0.5">{overview.subtitle}</div>
             </div>
           </div>
           <div className="flex items-center gap-3">
             <div className="hidden md:flex flex-col items-end">
-              <span className="text-[12px] font-semibold text-slate-400 uppercase tracking-widest">距离初试</span>
-              <span className="font-bold text-indigo-600 text-xl leading-none tabular-nums">248 <span className="text-xs text-indigo-400">天</span></span>
+              <span className="text-[12px] font-semibold text-slate-400 uppercase tracking-widest">当前阶段</span>
+              <span className="font-bold text-indigo-600 text-xl leading-none tabular-nums">{overview.daysLabel}</span>
             </div>
             <span className="opacity-0 group-hover:opacity-100 transition-opacity text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg border border-indigo-100 flex items-center gap-1">
-              同步至 Agent <ExternalLink size={12} />
+              查看说明 <ExternalLink size={12} />
             </span>
           </div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-            <div className="text-[13px] text-slate-500 mb-1 font-semibold uppercase tracking-wider">报考院校</div>
-            <div className="font-bold text-slate-800 text-[17px]">南京大学</div>
-          </div>
-          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-            <div className="text-[13px] text-slate-500 mb-1 font-semibold uppercase tracking-wider">报考专业</div>
-            <div className="font-bold text-slate-800 text-[17px]">软件工程</div>
-          </div>
-          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-            <div className="text-[13px] text-slate-500 mb-1 font-semibold uppercase tracking-wider">目标分数</div>
-            <div className="font-bold text-indigo-700 text-[17px] tabular-nums">385+</div>
-          </div>
-          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
-            <div className="text-[13px] text-slate-500 mb-1 font-semibold uppercase tracking-wider">当前胜率评估</div>
-            <div className="font-bold text-emerald-600 text-[17px]">62% 提升期</div>
-          </div>
+          {overview.cards.map((card) => (
+            <div key={card.label} className="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+              <div className="text-[13px] text-slate-500 mb-1 font-semibold uppercase tracking-wider">{card.label}</div>
+              <div className="font-bold text-slate-800 text-[17px]">{card.value}</div>
+            </div>
+          ))}
         </div>
 
         <div>
           <div className="flex justify-between text-xs font-semibold text-slate-700 mb-2">
             <span>总复习进度</span>
-            <span className="tabular-nums">45%</span>
+            <span className="tabular-nums">{overview.progress}%</span>
           </div>
           <div className="relative h-2.5 bg-slate-100 rounded-full overflow-hidden">
-            <div className="h-full bg-indigo-500 w-[45%] rounded-full shadow-[0_0_10px_rgba(99,102,241,0.4)]" />
+            <div className="h-full bg-indigo-500 rounded-full shadow-[0_0_10px_rgba(99,102,241,0.4)]" style={{ width: `${overview.progress}%` }} />
           </div>
           <div className="mt-2 flex justify-between text-[12px] font-semibold text-slate-400">
-            <span>基础期</span>
-            <span className="text-indigo-500">· 强化期（当前）</span>
-            <span>冲刺期</span>
-            <span>初试</span>
+            {progressMarkers.map((label, index) => (
+              <span key={label} className={index === 1 ? 'text-indigo-500' : undefined}>{index === 1 ? `· ${label}` : label}</span>
+            ))}
           </div>
         </div>
       </motion.div>
@@ -177,7 +126,7 @@ export default function ProfileView() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.05 }}
-          data-pet-hint="4 学科对照：专业课领先、数学符合、英语微落后、政治落后最严重。系统建议重点抓政治背诵。"
+          data-pet-hint="这里对照不同维度的阶段进展，当前暂无新的进展记录。"
           className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 flex flex-col hover:border-emerald-200 hover:shadow-md transition-all duration-300"
         >
           <div className="flex items-center justify-between gap-3 mb-5">
@@ -187,13 +136,13 @@ export default function ProfileView() {
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg leading-tight">当前阶段进展</h3>
-                <div className="text-xs font-medium text-slate-500 mt-0.5">10 月强化冲刺期 · 四大学科对照</div>
+                <div className="text-xs font-medium text-slate-500 mt-0.5">当前空态 · 核心维度对照</div>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 flex-1">
-            {STAGE_PROGRESS.map((item) => {
+            {stageProgress.map((item: StageProgress) => {
               const s = statusStyle[item.status];
               const Icon = s.icon;
               return (
@@ -243,7 +192,7 @@ export default function ProfileView() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.1 }}
-          data-pet-hint="多维能力雷达：6 维对比目标院校要求，红点是差距最大的维度——政治、英语、数学是重点突破方向。"
+          data-pet-hint="这里展示能力雷达与目标基线之间的差距，当前暂无分析结果。"
           className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 flex flex-col hover:border-amber-200 hover:shadow-md transition-all duration-300"
         >
           <div className="flex items-center justify-between gap-3 mb-3">
@@ -253,15 +202,15 @@ export default function ProfileView() {
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-[17px] leading-tight">多维能力雷达</h3>
-                <div className="text-[13px] text-slate-500 font-medium mt-0.5">当前 vs 目标要求</div>
+                <div className="text-[13px] text-slate-500 font-medium mt-0.5">当前 0 vs 目标 0</div>
               </div>
             </div>
             <span className="text-[11px] font-semibold text-violet-700 bg-violet-50 border border-violet-100 px-2 py-0.5 rounded uppercase tracking-widest">
-              target-gap
+              0-gap
             </span>
           </div>
           <div className="flex-1 flex items-center justify-center">
-            <RadarChart dimensions={ABILITY_RADAR} size={260} />
+            <RadarChart dimensions={abilityRadar} size={260} />
           </div>
         </motion.div>
       </div>
@@ -272,7 +221,7 @@ export default function ProfileView() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.15 }}
-          data-pet-hint="学业主线时间轴：已完成蓝桥国赛一等奖、暑期一轮、政治一轮，下一个里程碑是 10/25 的网报确认。"
+          data-pet-hint="这里展示阶段里程碑时间轴，当前暂无新的里程碑日期。"
           className="lg:col-span-2 bg-white rounded-3xl border border-slate-100 shadow-sm p-6 md:p-8 flex flex-col hover:border-rose-200 hover:shadow-md transition-all duration-300"
         >
           <div className="flex items-center justify-between gap-3 mb-6">
@@ -282,28 +231,28 @@ export default function ProfileView() {
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 text-lg leading-tight">阶段里程碑 · 主线时间轴</h3>
-                <div className="text-xs font-medium text-slate-500 mt-0.5">过去成果 · 近期节点 · 未来规划</div>
+                <div className="text-xs font-medium text-slate-500 mt-0.5">当前状态 · 后续节点 · 未来规划</div>
               </div>
             </div>
             <span className="text-[12px] font-semibold text-slate-500 bg-slate-50 border border-slate-200 px-2 py-1 rounded-full">
-              共 {MILESTONES.length} 节点
+              共 {milestones.length} 节点
             </span>
           </div>
 
           <div className="flex-1 flex flex-col justify-center pt-2 pb-4">
             <div className="relative">
               {/* Timeline line */}
-              <div className="absolute left-0 right-0 top-[22px] h-0.5 bg-slate-200 rounded-full" />
-              <div
-                className="absolute left-0 top-[22px] h-0.5 bg-indigo-400 rounded-full"
-                style={{ width: `${((MILESTONES.findIndex((m) => m.status === 'next') + 0.5) / MILESTONES.length) * 100}%` }}
-              />
+               <div className="absolute left-0 right-0 top-[22px] h-0.5 bg-slate-200 rounded-full" />
+               <div
+                  className="absolute left-0 top-[22px] h-0.5 bg-indigo-400 rounded-full"
+                  style={{ width: '0%' }}
+                />
 
-              <div className="grid" style={{ gridTemplateColumns: `repeat(${MILESTONES.length}, minmax(0, 1fr))` }}>
-                {MILESTONES.map((m) => {
-                  const isNext = m.status === 'next';
-                  const isDone = m.status === 'done';
-                  return (
+               <div className="grid" style={{ gridTemplateColumns: `repeat(${milestones.length}, minmax(0, 1fr))` }}>
+                 {milestones.map((m: MilestoneItem) => {
+                   const isNext = m.status === 'next';
+                   const isDone = m.status === 'done';
+                   return (
                     <div key={m.label} className="flex flex-col items-center text-center px-1">
                       <div
                         className={cn(
@@ -346,7 +295,7 @@ export default function ProfileView() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.2 }}
-          data-pet-hint="这是我记住的你：学科偏好、行为规律、个人特质。3 个 Agent 都会参考这些来给你个性化建议。"
+          data-pet-hint="这里展示共享记忆摘要，说明系统当前保留的跨页面上下文。"
           className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 relative overflow-hidden flex flex-col hover:border-indigo-200 hover:shadow-md transition-all duration-300"
         >
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-50/80 blur-2xl rounded-full pointer-events-none" />
@@ -355,38 +304,26 @@ export default function ProfileView() {
               <BrainCircuit size={18} />
             </div>
             <div>
-              <h3 className="font-bold text-slate-900 text-[17px] leading-tight">Agent 长期记忆摘要</h3>
-              <div className="text-[13px] text-slate-500 font-medium mt-0.5">跨 Agent 共享上下文</div>
+              <h3 className="font-bold text-slate-900 text-[17px] leading-tight">共享记忆摘要</h3>
+              <div className="text-[13px] text-slate-500 font-medium mt-0.5">跨页面共享的业务上下文</div>
             </div>
           </div>
 
           <div className="space-y-4 flex-1">
-            <div>
-              <div className="text-[12px] font-semibold text-indigo-600 uppercase tracking-widest mb-2">学科偏好</div>
-              <div className="flex flex-wrap gap-1.5">
-                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">数学一</span>
-                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">英语一</span>
-                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">408 专业课</span>
+            {memorySections.map((section) => (
+              <div key={section.title}>
+                <div className="text-[12px] font-semibold text-indigo-600 uppercase tracking-widest mb-2">{section.title}</div>
+                <div className="flex flex-wrap gap-1.5">
+                  {section.items.map((item) => (
+                    <span key={item} className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">{item}</span>
+                  ))}
+                </div>
               </div>
-            </div>
-            <div>
-              <div className="text-[12px] font-semibold text-indigo-600 uppercase tracking-widest mb-2">行为规律</div>
-              <div className="flex flex-wrap gap-1.5">
-                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">偏好夜间复习</span>
-                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">需强制番茄钟</span>
-              </div>
-            </div>
-            <div>
-              <div className="text-[12px] font-semibold text-indigo-600 uppercase tracking-widest mb-2">个人特质</div>
-              <div className="flex flex-wrap gap-1.5">
-                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">抗压能力中等</span>
-                <span className="bg-slate-50 border border-slate-200 text-slate-700 text-[13px] font-medium px-2 py-0.5 rounded-md">对截止日敏感</span>
-              </div>
-            </div>
+            ))}
           </div>
 
           <p className="mt-4 pt-4 border-t border-slate-100 text-[13px] text-slate-500 leading-relaxed font-medium">
-            上述标签由信息研判、日程规划、策略支持三个 Agent 在底层上下文共享，确保输出建议与个人特质拟合。
+            上述标签由统一内容层共享，便于不同页面在零数据状态下保持一致的业务上下文。
           </p>
         </motion.div>
       </div>

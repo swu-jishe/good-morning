@@ -10,14 +10,9 @@ import SettingsView from './views/SettingsView';
 import ProfileView from './views/ProfileView';
 import { ScheduleProvider, useSchedule } from './context/ScheduleContext';
 import { PetProvider, usePet } from './context/PetContext';
+import { submissionContent } from './content/submissionContent';
 
-const PAGE_SUMMARIES: Record<PageType, string> = {
-  dashboard: '聚合工作台：今日最需要关注"考研报名ddl"，10 月 25 日前要完成确认。',
-  academic: '学业规划：当前 GPA 3.82 领先，政治进度落后 15%，建议重点加强。',
-  schedule: '日程编排：本周 3 件事，考研报名 P0 最优先级，可点击查看完整回写时间线。',
-  profile: '成长档案：距初试 248 天，当前强化期进度 45%，胜率评估 62%。',
-  settings: '信息源与策略：已接入 2 个数据源，试试点"立即抓取"？',
-};
+const PAGE_SUMMARIES: Record<PageType, string> = submissionContent.navigation.pageSummaries;
 
 function useGlobalHoverHint() {
   const { speakPersistent, dismissPersistent } = usePet();

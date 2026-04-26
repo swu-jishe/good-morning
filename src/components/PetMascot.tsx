@@ -4,24 +4,17 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Move } from 'lucide-react';
 import { usePet } from '../context/PetContext';
 import { cn } from '../lib/utils';
+import { submissionContent } from '../content/submissionContent';
 
-const greetings = [
-  '你好，我是小知，今天也要元气满满哦！',
-  '你好，我是小知，Deadline 终结者就是你！',
-  '你好，我是小知，小步快跑，目标就在前方！',
-  '你好，我是小知，别忘了 10 月 25 日研招网确认！',
-  '你好，我是小知，夜猫子同款，今晚继续冲？',
-  '你好，我是小知，进度 45%，你已经比一半同学强了！',
-  '你好，我是小知，累的时候就休息一下，小知陪着你～',
-];
+const greetings = submissionContent.mascot.greetings;
 
 const easterEggLines = [
-  '哇！你发现我啦！🎉',
-  '别戳啦我会晕的～',
-  '我就知道你是个懂行的！',
-  '彩蛋模式启动！开发小哥给你比心❤️',
-  '你每次戳我，我都在数哦 ᕕ( ᐛ )ᕗ',
-  '连戳五次就能召唤我的隐藏身份…开发者！',
+  '哇，你把互动彩蛋点出来了。',
+  '轻一点，我还在努力站稳。',
+  '收到连击，今天状态拉满。',
+  '彩蛋模式启动，继续保持好奇心。',
+  '我有认真数次数，真的。',
+  '五连击达成，送你一个庆祝动作。',
 ];
 
 type AnimKey = 'hop' | 'squash' | 'wiggle' | 'blink' | 'celebrate' | 'greetingHop' | 'spin';
@@ -76,10 +69,9 @@ function clampPosition(p: Position): Position {
 
 function timeGreeting(): string | null {
   const hour = new Date().getHours();
-  if (hour < 6 || hour >= 23) return '夜深了，小知陪你冲刺～';
-  if (hour < 10) return '早上好！今天也一起搞定目标 ☀️';
-  if (hour >= 22) return '今天辛苦啦，注意休息～';
-  return null;
+  if (hour < 6 || hour >= 23) return submissionContent.mascot.timeGreetings.late;
+  if (hour < 10) return submissionContent.mascot.timeGreetings.early;
+  return submissionContent.mascot.timeGreetings.normal;
 }
 
 export default function PetMascot() {
@@ -247,7 +239,7 @@ export default function PetMascot() {
     } catch {
       // ignore
     }
-    speak('我回原来的位置啦～', 2500);
+    speak('我回到默认位置了。', 2500);
   };
 
   if (!isVisible) {
@@ -255,8 +247,8 @@ export default function PetMascot() {
       <button
         onClick={() => setVisible(true)}
         className="fixed bottom-6 left-24 z-[60] w-11 h-11 rounded-full bg-indigo-600 text-white font-bold shadow-lg hover:shadow-xl hover:bg-indigo-700 transition-all flex items-center justify-center"
-        aria-label="召唤小知"
-        title="召唤小知"
+        aria-label="显示助手"
+        title="显示助手"
       >
         <span className="text-[14px] tracking-widest">知</span>
       </button>
@@ -266,6 +258,7 @@ export default function PetMascot() {
   // When position is set, use absolute left/top; otherwise default CSS anchor.
   const usingCustomPosition = position !== null;
   const topHalf = position ? position.y < window.innerHeight / 2 : false;
+  const controlsVisible = hovered && !isDragging;
   // Bubble absolute-positioned so pet layout is never affected by bubble toggling
   const bubbleWrapperClass = topHalf
     ? 'absolute left-0 top-full mt-3'
@@ -333,11 +326,11 @@ export default function PetMascot() {
             'block cursor-pointer drop-shadow-[0_4px_10px_rgba(99,102,241,0.25)] outline-none select-none',
             isDragging && 'cursor-grabbing drop-shadow-[0_10px_20px_rgba(99,102,241,0.35)]',
           )}
-          aria-label="小知 · 点击互动（可拖拽）"
+          aria-label="助手形象，点击互动（可拖拽）"
         >
           <img
             src="/pet.png"
-            alt="小知"
+            alt="助手形象"
             className="w-48 h-48 object-contain select-none"
             style={{ imageRendering: 'pixelated' }}
             draggable={false}
@@ -346,9 +339,10 @@ export default function PetMascot() {
 
         {/* Hover controls */}
         <div
+          aria-hidden={!controlsVisible}
           className={cn(
             'absolute -top-1 -right-1 flex items-center gap-1 transition-opacity',
-            hovered && !isDragging ? 'opacity-100' : 'opacity-0',
+            controlsVisible ? 'opacity-100' : 'opacity-0 pointer-events-none',
           )}
         >
           {usingCustomPosition && (
@@ -357,6 +351,7 @@ export default function PetMascot() {
               className="w-5 h-5 rounded-full bg-indigo-100 hover:bg-indigo-200 text-indigo-700 flex items-center justify-center"
               aria-label="回到默认位置"
               title="回到默认位置"
+              tabIndex={controlsVisible ? 0 : -1}
             >
               <Move size={10} />
             </button>
@@ -364,8 +359,9 @@ export default function PetMascot() {
           <button
             onClick={() => setVisible(false)}
             className="w-5 h-5 rounded-full bg-slate-200 hover:bg-slate-300 text-slate-600 flex items-center justify-center"
-            aria-label="隐藏小知"
-            title="隐藏小知（可重新召唤）"
+            aria-label="隐藏助手"
+            title="隐藏助手（可重新显示）"
+            tabIndex={controlsVisible ? 0 : -1}
           >
             <X size={10} />
           </button>

@@ -10,11 +10,7 @@
 
 > <https://good-morning-henna.vercel.app/>
 
-历史 AI Studio 预览版：
-
-> <https://aistudio.google.com/apps/332d005c-27fb-4e04-922f-b26ec8873b2d?showAssistant=true&showPreview=true>
-
-## 项目简介
+> 
 
 知途是一个用于比赛演示的前端 Demo，核心强调四件事：
 

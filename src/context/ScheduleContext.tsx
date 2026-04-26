@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 import { EventItem, WritebackStep } from '../types';
-import { INITIAL_EVENTS } from '../data/events';
+import { submissionContent } from '../content/submissionContent';
 
 interface ScheduleCtx {
   events: EventItem[];
@@ -17,8 +17,9 @@ function uniqueStepId(eventId: string, time: string, label: string) {
 }
 
 export function ScheduleProvider({ children }: { children: ReactNode }) {
-  const [events, setEvents] = useState<EventItem[]>(INITIAL_EVENTS);
-  const [selectedEventId, setSelectedEventId] = useState<string>('1');
+  const initialEvents = submissionContent.schedule.events as EventItem[];
+  const [events, setEvents] = useState<EventItem[]>(initialEvents);
+  const [selectedEventId, setSelectedEventId] = useState<string>(initialEvents[0]?.id ?? '');
   const [recentlyAppendedIds, setRecentlyAppendedIds] = useState<string[]>([]);
 
   const appendWriteback = useCallback((eventId: string, steps: WritebackStep[]) => {

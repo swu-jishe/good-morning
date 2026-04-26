@@ -3,6 +3,7 @@ import { LayoutDashboard, CalendarDays, Settings, Radar, BookOpen, GraduationCap
 import { cn } from '../lib/utils';
 import { motion } from 'motion/react';
 import { useState } from 'react';
+import { submissionContent } from '../content/submissionContent';
 
 interface SidebarProps {
   currentPage: PageType;
@@ -21,13 +22,14 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   ] as const;
 
   return (
-    <div className="relative h-full shrink-0 z-50 hidden md:block w-[5.5rem]">
+    <div className="relative h-full shrink-0 z-50 w-[16.25rem] md:w-[5.5rem]">
       <nav 
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className={cn(
           "absolute left-0 top-0 h-full bg-white border-r border-slate-100 shadow-sm transition-all duration-300 ease-[cubic-bezier(0.2,0.8,0.2,1)] overflow-hidden",
-          isHovered ? "w-[16.25rem]" : "w-[5.5rem]"
+          "w-[16.25rem]",
+          isHovered ? "md:w-[16.25rem]" : "md:w-[5.5rem]"
         )}
       >
         <div className="w-[16.25rem] flex flex-col h-full pt-6 pb-6">
@@ -36,10 +38,10 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
             <div className="w-10 h-10 shrink-0 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-md shadow-indigo-200">
               <Radar size={24} strokeWidth={2.5} />
             </div>
-            <div className={cn("transition-opacity duration-300 flex flex-col justify-center", isHovered ? "opacity-100 delay-100" : "opacity-0")}>
-              <h1 className="font-bold text-slate-900 text-[19px] tracking-tight leading-tight">知途</h1>
+            <div className={cn("transition-opacity duration-300 flex flex-col justify-center opacity-100 md:opacity-0", isHovered && "md:opacity-100 md:delay-100")}>
+              <h1 className="font-bold text-slate-900 text-[19px] tracking-tight leading-tight">{submissionContent.navigation.appName}</h1>
               <span className="text-[12px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md inline-block w-fit mt-0.5">
-                任务协同闭环
+                {submissionContent.navigation.badge}
               </span>
             </div>
           </div>
@@ -65,8 +67,9 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                   )}
                   <Icon size={20} className={cn("shrink-0", isActive ? "text-indigo-600" : "text-slate-400 group-hover:text-slate-600")} />
                   <span className={cn(
-                    "ml-3.5 transition-opacity duration-300 whitespace-nowrap text-[17px]", 
-                    isHovered ? "opacity-100 delay-100" : "opacity-0 pointer-events-none",
+                    "ml-3.5 transition-opacity duration-300 whitespace-nowrap text-[17px] opacity-100 md:opacity-0",
+                    isHovered && "md:opacity-100 md:delay-100",
+                    !isHovered && "md:pointer-events-none",
                     isActive ? "text-indigo-700" : "text-slate-500 group-hover:text-slate-900"
                   )}>
                     {label}

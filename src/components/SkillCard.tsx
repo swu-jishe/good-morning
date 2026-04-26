@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import {
   MessageSquare,
@@ -46,6 +46,14 @@ export default function SkillCard({ skill }: { skill: SkillDef }) {
   const [modalOpen, setModalOpen] = useState(false);
   const s = agentStyles[skill.ownerAgent];
   const AgentIcon = s.icon;
+  const dialogTitleId = useId();
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (modalOpen) {
+      closeButtonRef.current?.focus();
+    }
+  }, [modalOpen]);
 
   return (
     <div className="bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md transition-all overflow-hidden flex flex-col h-full">
@@ -138,7 +146,7 @@ export default function SkillCard({ skill }: { skill: SkillDef }) {
 
       <div className="px-4 py-3 border-t border-slate-100 bg-slate-50/40 flex items-center justify-between">
         <span className="text-[12px] font-bold text-slate-400 uppercase tracking-widest">
-          Anthropic Agent Skills
+          Capability Spec
         </span>
         <button
           onClick={() => setModalOpen(true)}
@@ -163,6 +171,10 @@ export default function SkillCard({ skill }: { skill: SkillDef }) {
               exit={{ opacity: 0, scale: 0.96, y: 10 }}
               transition={{ type: 'spring', damping: 22, stiffness: 260 }}
               onClick={(e) => e.stopPropagation()}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={dialogTitleId}
+              tabIndex={-1}
               className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[80vh] flex flex-col overflow-hidden"
             >
               <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-slate-50">
@@ -171,13 +183,15 @@ export default function SkillCard({ skill }: { skill: SkillDef }) {
                     <FileText size={14} />
                   </div>
                   <div>
-                    <div className="font-mono font-bold text-slate-800 text-[15px]">skills/{skill.code}.md</div>
-                    <div className="text-[12px] text-slate-500 font-medium">Anthropic Agent Skills 规范</div>
+                    <div id={dialogTitleId} className="font-mono font-bold text-slate-800 text-[15px]">skills/{skill.code}.md</div>
+                    <div className="text-[12px] text-slate-500 font-medium">能力说明文档</div>
                   </div>
                 </div>
                 <button
+                  ref={closeButtonRef}
                   onClick={() => setModalOpen(false)}
                   className="w-8 h-8 rounded-lg hover:bg-slate-200/60 text-slate-500 flex items-center justify-center"
+                  aria-label="关闭能力说明文档"
                 >
                   <X size={16} />
                 </button>

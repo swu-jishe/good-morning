@@ -18,9 +18,17 @@ export interface WritebackStep {
   meta?: string;
 }
 
+export interface EventChecklistItem {
+  id: string;
+  title: string;
+  estimate: string;
+  done: boolean;
+}
+
 export interface EventItem {
   id: string;
   title: string;
+  calendarDate: string;
   date: string;
   time?: string;
   source: SourceType;
@@ -28,6 +36,7 @@ export interface EventItem {
   summary: string;
   actionRequired?: string;
   url?: string;
+  checklist?: EventChecklistItem[];
   writebackTimeline?: WritebackStep[];
 }
 

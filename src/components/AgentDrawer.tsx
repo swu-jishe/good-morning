@@ -1,185 +1,36 @@
-import { AgentType, WritebackStep } from '../types';
-import { MessageSquare, CalendarCheck, Lightbulb, Sparkles, Send, Settings2, X, ChevronDown, ExternalLink, Check, FileText, Users } from 'lucide-react';
-import { cn } from '../lib/utils';
-import { motion, AnimatePresence } from 'motion/react';
-import { useState, useEffect, useRef, type DragEvent, type MouseEvent as ReactMouseEvent } from 'react';
-import { useSchedule } from '../context/ScheduleContext';
-import { usePet } from '../context/PetContext';
+import type {DragEvent, KeyboardEvent, MouseEvent as ReactMouseEvent} from 'react';
+import {useEffect, useRef, useState} from 'react';
+import {AnimatePresence, motion} from 'motion/react';
+import {
+  CalendarCheck,
+  FileText,
+  Lightbulb,
+  MessageSquare,
+  Send,
+  Settings2,
+  Sparkles,
+  Users,
+  X,
+} from 'lucide-react';
+import type {AgentType} from '../types';
+import {submissionContent} from '../content/submissionContent';
+import {usePet} from '../context/PetContext';
+import {cn} from '../lib/utils';
 
-interface Citation {
-  id: number;
-  title: string;
-  summary: string;
-  url: string;
-}
-
-interface ModificationCard {
-  original: string;
-  updated: string;
-  impact: string;
-  affectedEventId?: string;
-  writebackSteps?: WritebackStep[];
-}
+const FOCUSABLE_SELECTOR = [
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'textarea:not([disabled])',
+  'select:not([disabled])',
+  'a[href]',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
 
 interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
   agentId?: AgentType;
   text: string;
-  citations?: Citation[];
-  modificationCard?: ModificationCard;
-}
-
-const MOCK_RESPONSES: Record<string, {text: string, agentId: AgentType, citations?: Citation[], modificationCard?: ModificationCard, petSummary?: string}> = {
-  // Judgment Agent
-  '解读今日高优预警': {
-    agentId: 'judgment',
-    text: '今天探测到 2 条与你的系统强相关的警告事项：\n\n南京大学研招网：报名信息确认截止时间迫在眉睫，如果不完成将无法获取考点资格。\n《计算机网络》课程：最新的实验报告上机要求已发布。\n\n需要我帮你定位具体流程入口吗？',
-    citations: [
-      { id: 1, title: '南大研招网系统通知', summary: '官方通知：2026年硕士招生信息确认时间点及在线提交流程更新。', url: 'https://yz.chsi.com.cn' },
-      { id: 2, title: '教务通 - 计网作业', summary: '实验四：TCP/IP 协议分析作业详情及机房准入要求。', url: 'https://i.chaoxing.com/' }
-    ],
-    petSummary: '今天有 2 条高优警告，研招网和计网实验都要抓紧～',
-  },
-  '总结近期院校通知': {
-    agentId: 'judgment',
-    text: '为你追踪了近3天的高频异动信息：\n目标院校的考点安排公告已正式张贴。同时校内保研政策进行了局部微调，剔除了四级成绩的基础强制要求。\n已在信息池为你自动收录并打标。',
-    citations: [
-      { id: 1, title: '南京大学研究生院公告', summary: '关于2026届考点安排和考场指令的最新通报文件。', url: '#' }
-    ],
-    petSummary: '近期 2 条院校通知，考点和保研政策都有更新哦！',
-  },
-  '过滤低迷信息': {
-    agentId: 'judgment',
-    text: '已自动执行去噪算法。屏蔽了考研超话中的 45 条贩卖焦虑贴，以及屏蔽了二手书转让无效发帖。你的信息主池已恢复洁净。',
-    petSummary: '帮你屏蔽了 45 条焦虑贴，专注冲刺吧！',
-  },
-  
-  // Planning Agent
-  '帮我规划本周节奏': {
-    agentId: 'planning',
-    text: '我已将网报确认与计网实验剥离，并为你提议了如下的底层编排变更：\n将计网上机提前至今日完成，彻底空出周五的网报时间。请在下方点击确认落库。',
-    modificationCard: {
-       original: "《计算机网络》实验上机 (本周五)",
-       updated: "《计算机网络》实验上机 (改成今日 19:00)",
-       impact: "已完美规避报名信息确认的物理冲突",
-       affectedEventId: '2',
-       writebackSteps: [
-         { time: '刚刚', platform: 'user', label: '用户确认重排并授权回写', status: 'done', meta: 'modification-card #mc-2410' },
-         { time: '刚刚', platform: 'openclaw', label: 'OpenClaw 已更新任务时间', status: 'done', meta: 'task_id=oc-45218' },
-       ],
-    },
-    petSummary: '我把实验挪到今晚 19:00，周五就能安心网报啦～',
-  },
-  '推迟低优活动': {
-    agentId: 'planning',
-    text: '已扫描日程。建议将本周四下午的"前端公开课分享"延后至下周一。',
-    modificationCard: {
-       original: "公开课分享 (周四)",
-       updated: "公开课分享 (下周一 14:00)",
-       impact: "释放本周四 2 小时用作政治重点突破",
-    },
-    petSummary: '公开课挪到下周，周四可以冲政治！',
-  },
-  '为模拟考预留时间': {
-    agentId: 'planning',
-    text: '好的，我已经为你锁定了周六下午 14:00 - 17:00 这个完整的3小时区块，期间会自动开启免打扰番茄钟引擎。',
-    petSummary: '周六下午 14-17 点已锁定，记得免打扰哦！',
-  },
-
-  // Policy Agent
-  '评估当前备考进度': {
-    agentId: 'policy',
-    text: '结合你多维能力画像，数据结构已达标，但政治马原背诵落后进度 15%。我已经为你生成了一套追赶计划节点。',
-    citations: [
-      { id: 1, title: '阶段进展卡', summary: '基于当前 10 月强化冲刺期的指标进行对比换算。', url: '#' }
-    ],
-    petSummary: '数据结构已达标，政治落后 15% 要追一追！',
-  },
-  '分析目标院校报录比': {
-    agentId: 'policy',
-    text: '双一流南大软工的最新统考竞争度情况，已被我整理成了图表报告卡：',
-    citations: [
-      { id: 1, title: '网报大数据监控版', summary: '系统抓取到预计报名人数有小幅上扬。', url: '#' },
-    ],
-    petSummary: '南大软工报名人数略涨，我们继续稳住节奏～',
-  },
-  '推荐适合的复习资料': {
-    agentId: 'policy',
-    text: '考虑到你倾向于夜间复习并存在数学短板，推荐使用《李林真题解析》来增强空间向量的计算硬度。',
-    petSummary: '推荐《李林真题解析》，补数学短板正合适！',
-  },
-};
-
-const CitationBlock = ({ citation }: { citation: Citation }) => {
-  const [open, setOpen] = useState(false);
-  return (
-    <div className="mt-2.5 ml-1 mr-4 bg-white border border-slate-200 rounded-xl shadow-sm transition-all hover:border-slate-300">
-      <div onClick={() => setOpen(!open)} className="px-3 py-2 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition-colors rounded-xl">
-        <div className="flex items-center gap-2 text-[14px] font-bold text-slate-700">
-           <span className="w-[1.125rem] h-[1.125rem] rounded bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[12px] text-indigo-700 shrink-0">
-             {citation.id}
-           </span>
-           <span className="truncate max-w-[12rem] text-slate-800">{citation.title}</span>
-        </div>
-        <ChevronDown size={14} className={cn("text-slate-400 transition-transform duration-300", open ? "rotate-180 text-indigo-500" : "")} />
-      </div>
-      <AnimatePresence>
-        {open && (
-          <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden">
-             <div className="px-3 pb-3 pt-1 border-t border-slate-100/60 mt-1">
-                <p className="text-[13px] text-slate-500 leading-relaxed font-medium">{citation.summary}</p>
-                {citation.url !== '#' && (
-                   <a href={citation.url} target="_blank" rel="noreferrer" className="mt-2.5 w-fit inline-flex items-center gap-1.5 text-[13px] font-bold px-2.5 py-1 bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 hover:text-indigo-800 transition-colors">
-                     访问来源链接 <ExternalLink size={10} />
-                   </a>
-                )}
-             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-const ModCardBlock = ({ mod, onConfirm }: { mod: ModificationCard; onConfirm: (m: ModificationCard) => void }) => {
-  const [confirmed, setConfirmed] = useState(false);
-  const handleConfirm = () => {
-    if (confirmed) return;
-    setConfirmed(true);
-    onConfirm(mod);
-  };
-  return (
-    <div className="mt-3 ml-1 mr-4 bg-indigo-50/50 border border-indigo-100 rounded-2xl shadow-sm overflow-hidden">
-      <div className="p-3 border-b border-indigo-100 bg-white">
-        <div className="flex flex-col gap-2 relative">
-          <div className="text-[14px] text-slate-400 line-through font-medium">{mod.original}</div>
-          <div className="text-[16px] text-indigo-900 font-bold flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />
-            {mod.updated}
-          </div>
-        </div>
-      </div>
-      <div className="p-3 bg-indigo-50/30">
-        <div className="text-[13px] text-indigo-700 mb-3 font-medium flex items-start gap-1.5">
-           <Sparkles size={12} className="shrink-0 mt-0.5 opacity-60" />
-           {mod.impact}
-        </div>
-        <button 
-           onClick={handleConfirm}
-           disabled={confirmed}
-           className={cn("w-full py-2 rounded-xl text-[14px] font-bold transition-all flex justify-center items-center gap-1.5", confirmed ? "bg-emerald-500 text-white shadow-sm border border-emerald-500" : "bg-indigo-600 text-white hover:bg-indigo-700 shadow-md border hover:border-indigo-800 active:scale-[0.98]")}
-        >
-          {confirmed ? <><Check size={14}/>已回写至日程时间线</> : "确认变更并写入日程"}
-        </button>
-        {confirmed && mod.affectedEventId && (
-          <div className="mt-2 text-[12px] text-emerald-700 font-semibold text-center leading-relaxed">
-            已向日程编排页追加 {mod.writebackSteps?.length ?? 0} 条联动步骤，可切换到「日程编排」查看
-          </div>
-        )}
-      </div>
-    </div>
-  );
 }
 
 interface AgentDrawerProps {
@@ -190,13 +41,47 @@ const MIN_DRAWER_WIDTH = 288;
 const MAX_DRAWER_WIDTH = 640;
 const DEFAULT_DRAWER_WIDTH = 376;
 const STORAGE_KEY = 'zhitu-agent-drawer-width';
+const KEYBOARD_RESIZE_STEP = 16;
+const SYSTEM_MESSAGE_ID = 'sys_init';
 
-export default function AgentDrawer({ agentType }: AgentDrawerProps) {
-  const { appendWriteback } = useSchedule();
-  const { speak: petSpeak, setThinking: petSetThinking, celebrate: petCelebrate } = usePet();
+const agentConfig: Record<
+  AgentType,
+  {
+    id: AgentType;
+    shortName: string;
+    name: string;
+    icon: typeof MessageSquare;
+    color: string;
+  }
+> = {
+  judgment: {
+    id: 'judgment',
+    shortName: '研判',
+    name: '信息研判 Agent',
+    icon: MessageSquare,
+    color: 'bg-blue-500',
+  },
+  planning: {
+    id: 'planning',
+    shortName: '规划',
+    name: '日程规划 Agent',
+    icon: CalendarCheck,
+    color: 'bg-emerald-500',
+  },
+  policy: {
+    id: 'policy',
+    shortName: '策略',
+    name: '策略支持 Agent',
+    icon: Lightbulb,
+    color: 'bg-violet-500',
+  },
+};
+
+export default function AgentDrawer({agentType}: AgentDrawerProps) {
+  const assistantCopy = submissionContent.assistant;
+  const {speak: petSpeak} = usePet();
   const [activeAgents, setActiveAgents] = useState<AgentType[]>([agentType]);
   const [isConfigOpen, setIsConfigOpen] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
   const [drawerWidth, setDrawerWidth] = useState<number>(() => {
     if (typeof window === 'undefined') return DEFAULT_DRAWER_WIDTH;
     const stored = Number(window.localStorage.getItem(STORAGE_KEY));
@@ -204,14 +89,30 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
     return Math.max(MIN_DRAWER_WIDTH, Math.min(MAX_DRAWER_WIDTH, stored));
   });
   const [isResizing, setIsResizing] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([
+    {id: SYSTEM_MESSAGE_ID, role: 'system', text: assistantCopy.systemMessage},
+  ]);
+  const [inputText, setInputText] = useState('');
+  const [dragOverlay, setDragOverlay] = useState(false);
+  const [agentPrompts, setAgentPrompts] = useState<Record<AgentType, string>>({
+    ...assistantCopy.prompts,
+  });
   const isResizingRef = useRef(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const configTitleId = 'agent-drawer-config-title';
+  const openConfigButtonRef = useRef<HTMLButtonElement | null>(null);
+  const closeConfigButtonRef = useRef<HTMLButtonElement | null>(null);
+  const dialogRef = useRef<HTMLDivElement | null>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
 
-  const handleModConfirm = (mod: ModificationCard) => {
-    if (mod.affectedEventId && mod.writebackSteps && mod.writebackSteps.length > 0) {
-      appendWriteback(mod.affectedEventId, mod.writebackSteps);
-    }
-    petCelebrate('完美！已经帮你同步到日程时间线啦 ✨');
+  const stopResize = () => {
+    isResizingRef.current = false;
+    setIsResizing(false);
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
   };
+
+  const clampWidth = (width: number) => Math.max(MIN_DRAWER_WIDTH, Math.min(MAX_DRAWER_WIDTH, width));
 
   useEffect(() => {
     const handleMove = (e: MouseEvent) => {
@@ -222,18 +123,19 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
       );
       setDrawerWidth(next);
     };
+
     const handleUp = () => {
       if (!isResizingRef.current) return;
-      isResizingRef.current = false;
-      setIsResizing(false);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
+      stopResize();
     };
+
     document.addEventListener('mousemove', handleMove);
     document.addEventListener('mouseup', handleUp);
+
     return () => {
       document.removeEventListener('mousemove', handleMove);
       document.removeEventListener('mouseup', handleUp);
+      stopResize();
     };
   }, []);
 
@@ -241,6 +143,28 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
     if (typeof window === 'undefined') return;
     window.localStorage.setItem(STORAGE_KEY, String(drawerWidth));
   }, [drawerWidth]);
+
+  useEffect(() => {
+    setActiveAgents([agentType]);
+    setMessages([{id: SYSTEM_MESSAGE_ID, role: 'system', text: assistantCopy.systemMessage}]);
+    setInputText('');
+  }, [agentType, assistantCopy.systemMessage]);
+
+  useEffect(() => {
+    if (!isConfigOpen) {
+      const focusTarget = previousFocusRef.current ?? openConfigButtonRef.current;
+      focusTarget?.focus();
+      previousFocusRef.current = null;
+      return;
+    }
+
+    previousFocusRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeConfigButtonRef.current?.focus();
+  }, [isConfigOpen]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({behavior: 'smooth'});
+  }, [messages, activeAgents]);
 
   const startResize = (e: ReactMouseEvent) => {
     e.preventDefault();
@@ -253,288 +177,230 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
   const resetWidth = () => {
     setDrawerWidth(DEFAULT_DRAWER_WIDTH);
   };
-  const [messages, setMessages] = useState<Message[]>([
-     { id: 'sys_init', role: 'system', text: '知途多智能体 (Multi-Agent) 协同工作组已就绪，可随时添加或移除参与计算的 Agent。' }
-  ]);
-  const [inputText, setInputText] = useState("");
-  const [dragOverlay, setDragOverlay] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    // If navigation passes a primary agent, ensure it's selected.
-    if (!activeAgents.includes(agentType)) {
-      setActiveAgents(prev => [...prev, agentType]);
+  const handleResizeKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      setDrawerWidth((prev) => clampWidth(prev + KEYBOARD_RESIZE_STEP));
+      return;
     }
-  }, [agentType]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const toggleAgent = (t: AgentType) => {
-    setActiveAgents(prev => {
-      // Allow unselecting down to 1 agent
-      if (prev.includes(t)) {
-        if (prev.length === 1) return prev; // Do not deselect the last active agent
-        return prev.filter(a => a !== t);
-      } else {
-        return [...prev, t];
+    if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      setDrawerWidth((prev) => clampWidth(prev - KEYBOARD_RESIZE_STEP));
+      return;
+    }
+
+    if (event.key === 'Home') {
+      event.preventDefault();
+      setDrawerWidth(MIN_DRAWER_WIDTH);
+      return;
+    }
+
+    if (event.key === 'End') {
+      event.preventDefault();
+      setDrawerWidth(MAX_DRAWER_WIDTH);
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      resetWidth();
+    }
+  };
+
+  const toggleAgent = (target: AgentType) => {
+    setActiveAgents((prev) => {
+      if (prev.includes(target)) {
+        if (prev.length === 1) return prev;
+        return prev.filter((agent) => agent !== target);
       }
+
+      return [...prev, target];
     });
   };
 
-  const agentConfig = {
-    judgment: {
-      id: 'judgment' as AgentType,
-      shortName: '研判',
-      name: '信息研判 Agent',
-      icon: MessageSquare,
-      color: 'bg-blue-500',
-      lightColor: 'bg-blue-50',
-      textColor: 'text-blue-700',
-      suggestions: ['解读今日高优预警', '总结近期院校通知', '过滤低迷信息']
-    },
-    planning: {
-      id: 'planning' as AgentType,
-      shortName: '规划',
-      name: '日程规划 Agent',
-      icon: CalendarCheck,
-      color: 'bg-emerald-500',
-      lightColor: 'bg-emerald-50',
-      textColor: 'text-emerald-700',
-      suggestions: ['帮我规划本周节奏', '推迟低优活动', '为模拟考预留时间']
-    },
-    policy: {
-      id: 'policy' as AgentType,
-      shortName: '策略',
-      name: '策略支持 Agent',
-      icon: Lightbulb,
-      color: 'bg-violet-500',
-      lightColor: 'bg-violet-50',
-      textColor: 'text-violet-700',
-      suggestions: ['评估当前备考进度', '分析目标院校报录比', '推荐适合的复习资料']
-    }
+  const handleSendMessage = (rawText: string) => {
+    const text = rawText.trim();
+    if (!text) return;
+
+    const timestamp = Date.now();
+    const assistantAgent = activeAgents[0] ?? agentType;
+
+    setMessages((prev) => [
+      ...prev,
+      {id: `user-${timestamp}`, role: 'user', text},
+      {
+        id: `assistant-${timestamp}`,
+        role: 'assistant',
+        agentId: assistantAgent,
+        text: assistantCopy.responseMessage,
+      },
+    ]);
+    setInputText('');
+    petSpeak(assistantCopy.responseMessage, 4000);
   };
-
-  const [agentPrompts, setAgentPrompts] = useState({
-    judgment: '系统级扮演：你是一个客观高效的信息研判专家。你的职责是从原始信息流中过滤噪音，提取高度强相关的变化、预警优先事项，以简练客观的方式汇报给用户。',
-    planning: '系统级扮演：你是一个统筹兼顾的日程智脑。遇到拖拽来的任务冲突卡片时，不仅要给出回复，还要配合【研判Agent】输出修改建议卡，等待系统回写确认。',
-    policy: '系统级扮演：你是一个拥有海量数据挖掘能力的策略教练。结合全局Profile上下文(如长期目标)进行智能诊断分析。'
-  });
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isTyping, activeAgents]);
-
-  const handleSendMessage = (text: string) => {
-    if (!text.trim()) return;
-
-    const userMsg: Message = { id: Date.now().toString(), role: 'user', text };
-    setMessages(prev => [...prev, userMsg]);
-    setInputText("");
-    setIsTyping(true);
-    petSetThinking(true);
-
-    // Contextual trigger for the drag-and-drop scenario
-    if (text.includes('考研报名确认预期冲突')) {
-       // Ensure Judgment and Planning are active
-       setActiveAgents(prev => Array.from(new Set([...prev, 'judgment', 'planning'])));
-       
-       setTimeout(() => {
-         setMessages(prev => [...prev, {
-           id: Date.now().toString() + 'sj',
-           role: 'assistant',
-           agentId: 'judgment',
-           text: '我已初步解析此冲突。研招网ddl优先级为绝对高优(P0)，《计算机网络》实验为常规考核(P2)。建议立刻优先保底网报。\n\n已下发联动指令，请 @规划 Agent 介入排程。'
-         }]);
-         petSpeak('发现ddl冲突！研招网 P0 优先，交给规划 Agent～', 3500);
-
-         setIsTyping(true);
-         petSetThinking(true);
-
-         setTimeout(() => {
-            setMessages(prev => [...prev, {
-              id: Date.now().toString() + 'sp',
-              role: 'assistant',
-              agentId: 'planning',
-              text: '收到研判要求。我已计算出安全重组方案。\n可将实验上机迁移至今日晚间执行，彻底空出周五ddl节点：',
-              modificationCard: {
-                 original: "《计算机网络》实验上机 (按原计划本周五)",
-                 updated: "将计网实验上机锁定在今日 19:00",
-                 impact: "成功规避撞期风险，并获取更多时间盈余。",
-                 affectedEventId: '2',
-                 writebackSteps: [
-                   { time: '刚刚', platform: 'user', label: '用户确认重排并授权回写', status: 'done', meta: 'modification-card #mc-2410' },
-                   { time: '刚刚', platform: 'dingtalk', label: '钉钉日历已更新实验时间', status: 'done', meta: 'ding-evt-9a7b3f' },
-                   { time: '刚刚', platform: 'openclaw', label: 'OpenClaw 已更新任务时间', status: 'done', meta: 'task_id=oc-45218' },
-                 ],
-              }
-            }]);
-            setIsTyping(false);
-            petSpeak('实验挪到今晚 19:00，等你点确认～', 5000);
-         }, 2500);
-
-       }, 1200);
-       return;
-    }
-
-    setTimeout(() => {
-      setIsTyping(false);
-      petSetThinking(false);
-      let responseMatched = false;
-      
-      for (const [key, canned] of Object.entries(MOCK_RESPONSES)) {
-        if (text.includes(key) || key.includes(text)) {
-           // Ensure the agent replying is actually in the active roster
-           if (!activeAgents.includes(canned.agentId)) {
-             setActiveAgents(prev => [...prev, canned.agentId]);
-           }
-           
-           setMessages(prev => [...prev, {
-             id: Date.now().toString() + 'r',
-             role: 'assistant',
-             agentId: canned.agentId,
-             text: canned.text,
-             citations: canned.citations,
-             modificationCard: canned.modificationCard
-           }]);
-           if (canned.petSummary) {
-             petSpeak(canned.petSummary, 5000);
-           }
-           responseMatched = true;
-           break;
-        }
-      }
-
-      if (!responseMatched) {
-         // Generic multi-agent response representation
-         const genericTeamResponse = activeAgents.map(a => `[${agentConfig[a].shortName} Agent]: 已捕获你的意图并录入知识库。`).join('\n\n');
-         
-         setMessages(prev => [...prev, {
-             id: Date.now().toString() + 'r',
-             role: 'assistant',
-             agentId: activeAgents[0],
-             text: `目前已分配至联合处理流水线：\n\n${genericTeamResponse}`
-         }]);
-         petSpeak('已交给协同流水线处理啦', 4000);
-      }
-    }, 1200); 
-  };
-
 
   const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragOverlay(true);
-  }
+  };
 
   const handleDragLeave = () => {
     setDragOverlay(false);
-  }
+  };
 
   const handleDrop = (e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragOverlay(false);
-    
-    // Auto-select Judgment and Planning capabilities as prep
-    setActiveAgents(prev => Array.from(new Set([...prev, 'judgment', 'planning'])));
-    
-    // Pre-fill input instead of auto-sending
-    setInputText("引用了 [预警：考研报名确认预期冲突] 卡片，请帮我排查冲突并重排计划。");
-  }
+    setInputText(assistantCopy.dragPrefill);
+  };
 
-  // Derived arrays
-  const activeNames = activeAgents.map(a => agentConfig[a].shortName).join('、');
-  const combinedSuggestions: string[] = Array.from(new Set(activeAgents.flatMap(a => agentConfig[a].suggestions)));
+  const handleConfigKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      setIsConfigOpen(false);
+      return;
+    }
+
+    if (event.key !== 'Tab' || !dialogRef.current) return;
+
+    const focusables = Array.from(
+      dialogRef.current.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+    );
+    if (focusables.length === 0) return;
+
+    const firstFocusable = focusables[0] as HTMLElement | undefined;
+    const lastFocusable = focusables[focusables.length - 1] as HTMLElement | undefined;
+    const activeElement = document.activeElement;
+
+    if (!firstFocusable || !lastFocusable) return;
+
+    if (!event.shiftKey && activeElement === lastFocusable) {
+      event.preventDefault();
+      firstFocusable.focus();
+      return;
+    }
+
+    if (event.shiftKey && activeElement === firstFocusable) {
+      event.preventDefault();
+      lastFocusable.focus();
+    }
+  };
+
+  const activeNames = activeAgents.map((agent) => agentConfig[agent].shortName).join('、');
+  const combinedSuggestions: string[] = Array.from(
+    new Set(activeAgents.flatMap((agent) => assistantCopy.suggestions[agent])),
+  );
 
   return (
-    <div 
-       onDragOver={handleDragOver}
-       onDragLeave={handleDragLeave}
-       onDrop={handleDrop}
-       style={{ width: `${drawerWidth}px` }}
-       className={cn(
-         "relative h-full z-20 shrink-0 bg-slate-50/50 border-l border-slate-200/60 shadow-sm flex flex-col overflow-hidden",
-         isResizing && "select-none",
-       )}
+    <div
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+      style={{width: `${drawerWidth}px`}}
+      className={cn(
+        'relative h-full z-20 shrink-0 bg-slate-50/50 border-l border-slate-200/60 shadow-sm flex flex-col overflow-hidden',
+        isResizing && 'select-none',
+      )}
     >
-      {/* Resize handle (drag left/right to adjust, double-click to reset) */}
       <div
         role="separator"
         aria-orientation="vertical"
         aria-label="拖动调整抽屉宽度"
+        aria-valuemin={MIN_DRAWER_WIDTH}
+        aria-valuemax={MAX_DRAWER_WIDTH}
+        aria-valuenow={drawerWidth}
+        tabIndex={0}
         onMouseDown={startResize}
         onDoubleClick={resetWidth}
+        onKeyDown={handleResizeKeyDown}
         className={cn(
-          "absolute left-0 top-0 bottom-0 w-1.5 z-40 cursor-col-resize transition-colors group/resize",
-          isResizing ? "bg-indigo-400" : "hover:bg-indigo-200",
+          'absolute left-0 top-0 bottom-0 w-1.5 z-40 cursor-col-resize transition-colors group/resize',
+          isResizing ? 'bg-indigo-400' : 'hover:bg-indigo-200',
         )}
       >
-        <div className={cn(
-          "absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-10 w-1 rounded-full transition-colors",
-          isResizing ? "bg-white" : "bg-slate-300 group-hover/resize:bg-indigo-400",
-        )} />
+        <div
+          className={cn(
+            'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-10 w-1 rounded-full transition-colors',
+            isResizing ? 'bg-white' : 'bg-slate-300 group-hover/resize:bg-indigo-400',
+          )}
+        />
       </div>
 
-      
-      {/* Header and Checkbox-style Selector */}
       <div className="px-5 pt-5 pb-4 border-b border-slate-200/60 flex flex-col shrink-0 bg-white z-20 shadow-sm">
         <div className="flex items-center justify-between">
-           <h2 className="font-bold text-slate-800 text-[17px] flex items-center gap-2 tracking-tight">
-              <div className="bg-indigo-100 p-1.5 rounded-lg text-indigo-600"><Users size={14} /></div>
-              多智能体协同引擎
-              <span className="ml-1 bg-emerald-50 text-emerald-600 text-[11px] px-1.5 py-0.5 rounded font-bold border border-emerald-100 uppercase tracking-widest">Team</span>
-           </h2>
-           <button onClick={() => setIsConfigOpen(true)} className="text-slate-400 hover:text-indigo-600 transition-colors p-1.5 focus:outline-none group">
-              <Settings2 size={18} className="group-hover:rotate-45 transition-transform" />
-           </button>
+          <h2 className="font-bold text-slate-800 text-[17px] flex items-center gap-2 tracking-tight">
+            <div className="bg-indigo-100 p-1.5 rounded-lg text-indigo-600">
+              <Users size={14} />
+            </div>
+            智能协同面板
+          </h2>
+          <button
+            type="button"
+            aria-label="打开协同配置"
+            onClick={() => setIsConfigOpen(true)}
+            ref={openConfigButtonRef}
+            className="text-slate-400 hover:text-indigo-600 transition-colors p-1.5 focus:outline-none group"
+          >
+            <Settings2 size={18} className="group-hover:rotate-45 transition-transform" />
+          </button>
         </div>
 
-        <p className="text-[13px] text-slate-500 mt-3.5 mb-2 font-medium">配置当前参与协作的组员 (支持多个)：</p>
+        <p className="text-[13px] text-slate-500 mt-3.5 mb-2 font-medium">
+          {assistantCopy.configNotice}
+        </p>
         <div className="flex flex-wrap gap-2 w-full mt-1">
-          {(['judgment', 'planning', 'policy'] as AgentType[]).map((t) => {
-            const isActive = activeAgents.includes(t);
-            const config = agentConfig[t];
+          {(['judgment', 'planning', 'policy'] as AgentType[]).map((agent) => {
+            const isActive = activeAgents.includes(agent);
+            const config = agentConfig[agent];
+
             return (
-              <button 
-                 key={t}
-                 onClick={() => toggleAgent(t)}
-                 className={cn(
-                   "relative h-[34px] rounded-xl flex items-center justify-center px-3.5 transition-all focus:outline-none border", 
-                   isActive ? cn(config.color, "border-transparent text-white shadow-md shadow-indigo-100") : "bg-slate-50/50 border-slate-200 text-slate-500 hover:bg-slate-100/80"
-                 )}
+              <button
+                key={agent}
+                type="button"
+                onClick={() => toggleAgent(agent)}
+                className={cn(
+                  'relative h-[34px] rounded-xl flex items-center justify-center px-3.5 transition-all focus:outline-none border',
+                  isActive
+                    ? cn(config.color, 'border-transparent text-white shadow-md shadow-indigo-100')
+                    : 'bg-slate-50/50 border-slate-200 text-slate-500 hover:bg-slate-100/80',
+                )}
               >
-                 <span className="relative z-10 flex items-center gap-1.5">
-                    <config.icon size={13} className={isActive ? "text-white" : "text-slate-400"} />
-                    <span className="text-[14px] font-bold whitespace-nowrap">
-                      {config.shortName}
-                    </span>
-                 </span>
-                 {isActive && (
-                    <div className="absolute top-0 right-0 w-[6px] h-[6px] rounded-bl text-white bg-white/20" />
-                 )}
+                <span className="relative z-10 flex items-center gap-1.5">
+                  <config.icon size={13} className={isActive ? 'text-white' : 'text-slate-400'} />
+                  <span className="text-[14px] font-bold whitespace-nowrap">{config.shortName}</span>
+                </span>
+                {isActive && (
+                  <div className="absolute top-0 right-0 w-[6px] h-[6px] rounded-bl text-white bg-white/20" />
+                )}
               </button>
-            )
+            );
           })}
         </div>
       </div>
 
-      {/* Drag Overlay */}
       <AnimatePresence>
-         {dragOverlay && (
-            <motion.div 
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              className="absolute inset-0 z-40 bg-indigo-500/10 backdrop-blur-[2px] border-[3px] border-indigo-500 border-dashed flex items-center justify-center pointer-events-none"
-            >
-                <div className="bg-white/90 backdrop-blur-md px-6 py-5 rounded-2xl shadow-2xl flex items-center gap-4">
-                   <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center shrink-0">
-                     <FileText size={24}/>
-                   </div>
-                   <div>
-                     <div className="font-bold text-slate-800 text-[17px] mb-0.5">松开手以引用于上下文</div>
-                     <div className="text-[14px] text-slate-500 font-medium">Team 即将联推冲突分析与排程</div>
-                   </div>
-                </div>
-            </motion.div>
-         )}
+        {dragOverlay && (
+          <motion.div
+            initial={{opacity: 0}}
+            animate={{opacity: 1}}
+            exit={{opacity: 0}}
+            className="absolute inset-0 z-40 bg-indigo-500/10 backdrop-blur-[2px] border-[3px] border-indigo-500 border-dashed flex items-center justify-center pointer-events-none"
+          >
+            <div className="bg-white/90 backdrop-blur-md px-6 py-5 rounded-2xl shadow-2xl flex items-center gap-4">
+              <div className="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center shrink-0">
+                <FileText size={24} />
+              </div>
+              <div>
+                <div className="font-bold text-slate-800 text-[17px] mb-0.5">松开手以填充输入框</div>
+                <div className="text-[14px] text-slate-500 font-medium">系统已就绪，等待后端返回。</div>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
 
-      {/* Unified Chat Area */}
       <div className="flex-1 overflow-y-auto custom-scrollbar px-4 py-5 flex flex-col gap-6">
         {messages.map((msg) => {
           if (msg.role === 'system') {
@@ -548,80 +414,57 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
             );
           }
 
-          // Resolve agent config for assistant messages, default to the first active one if none specified.
-          const aConf = msg.agentId ? agentConfig[msg.agentId] : agentConfig[activeAgents[0]];
+          const resolvedAgent = msg.agentId ?? activeAgents[0] ?? agentType;
+          const config = agentConfig[resolvedAgent];
 
           return (
-            <motion.div 
+            <motion.div
               key={msg.id}
-              initial={{ opacity: 0, y: 10, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              className={cn("flex gap-3", msg.role === 'user' ? "flex-row-reverse" : "flex-row")}
+              initial={{opacity: 0, y: 10, scale: 0.98}}
+              animate={{opacity: 1, y: 0, scale: 1}}
+              className={cn('flex gap-3', msg.role === 'user' ? 'flex-row-reverse' : 'flex-row')}
             >
               {msg.role === 'assistant' && (
-                <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5", aConf.color)}>
-                  <aConf.icon size={14} />
+                <div
+                  className={cn(
+                    'w-8 h-8 rounded-full flex items-center justify-center text-white shrink-0 shadow-sm mt-0.5',
+                    config.color,
+                  )}
+                >
+                  <config.icon size={14} />
                 </div>
               )}
-              
+
               <div className="flex flex-col max-w-[85%]">
-                <div className={cn(
-                  "px-4 py-3 relative break-words",
-                  msg.role === 'user' 
-                    ? "bg-indigo-600 text-white rounded-2xl rounded-tr-md shadow-md shadow-indigo-200/50" 
-                    : "bg-white border border-slate-200 shadow-sm rounded-2xl rounded-tl-md text-slate-700"
-                )}>
-                  {/* Agent Tag for Assistant responses */}
+                <div
+                  className={cn(
+                    'px-4 py-3 relative break-words',
+                    msg.role === 'user'
+                      ? 'bg-indigo-600 text-white rounded-2xl rounded-tr-md shadow-md shadow-indigo-200/50'
+                      : 'bg-white border border-slate-200 shadow-sm rounded-2xl rounded-tl-md text-slate-700',
+                  )}
+                >
                   {msg.role === 'assistant' && (
                     <div className="text-[12px] font-bold mb-1 opacity-60 flex items-center gap-1 uppercase tracking-wider">
-                      {aConf.name}
+                      {config.name}
                     </div>
                   )}
                   <div className="text-[15px] leading-relaxed font-medium whitespace-pre-wrap">
-                     {msg.text}
+                    {msg.text}
                   </div>
                 </div>
-
-                {/* Citations block */}
-                {msg.citations && msg.citations.length > 0 && (
-                   <div className="mt-1 flex flex-col gap-1">
-                      {msg.citations.map((c) => (
-                        <div key={c.id}>
-                          <CitationBlock citation={c} />
-                        </div>
-                      ))}
-                   </div>
-                )}
-
-                {/* Modification Card Block */}
-                {msg.modificationCard && (
-                   <ModCardBlock mod={msg.modificationCard} onConfirm={handleModConfirm} />
-                )}
               </div>
             </motion.div>
           );
         })}
-
-        {isTyping && (
-           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-3 mt-1">
-             <div className="w-8 h-8 rounded-full flex items-center justify-center text-white shrink-0 shadow-sm bg-slate-800">
-                <Users size={14} />
-             </div>
-             <div className="bg-white border border-slate-200 px-4 py-3 rounded-2xl rounded-tl-md shadow-sm flex items-center gap-2 h-10">
-               <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
-               <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
-               <div className="w-1.5 h-1.5 bg-slate-400 rounded-full animate-bounce"></div>
-             </div>
-           </motion.div>
-        )}
         <div ref={messagesEndRef} className="h-1 shrink-0" />
       </div>
 
-      {/* Floating Interleaved Suggestions from active agents */}
       <div className="px-3 pb-3 flex overflow-x-auto custom-scrollbar gap-2 shrink-0 bg-gradient-to-t from-white via-white to-transparent pt-4">
         {combinedSuggestions.map((suggestion) => (
-          <button 
+          <button
             key={suggestion}
+            type="button"
             onClick={() => handleSendMessage(suggestion)}
             className="shrink-0 text-[13px] font-bold text-slate-600 bg-white border border-slate-200 hover:border-indigo-300 hover:text-indigo-600 hover:shadow-sm rounded-xl px-3.5 py-2 transition-all active:scale-95"
           >
@@ -630,22 +473,27 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
         ))}
       </div>
 
-      {/* Input Area */}
       <div className="p-4 border-t border-slate-200/60 bg-white shrink-0 pb-6 lg:pb-4 shadow-sm">
         <div className="relative">
-          <input 
-            type="text" 
+          <input
+            type="text"
+            aria-label="团队输入框"
             value={inputText}
-            onChange={e => setInputText(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleSendMessage(inputText)}
-            placeholder={`交给团队 [${activeNames}] 处理...`}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSendMessage(inputText)}
+            placeholder={`输入协同内容，等待 [${activeNames}] 后端返回...`}
             className="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-4 pr-11 py-3.5 text-[15px] focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-50 transition-all font-semibold placeholder:font-medium placeholder:text-slate-400 shadow-sm"
           />
-          <button 
+          <button
+            type="button"
+            aria-label="发送消息"
+            disabled={inputText.trim().length === 0}
             onClick={() => handleSendMessage(inputText)}
             className={cn(
-              "absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 text-white rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-95",
-              inputText.trim().length > 0 ? "bg-indigo-600 hover:bg-indigo-700 hover:shadow-md" : "bg-slate-300 cursor-not-allowed"
+              'absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 text-white rounded-xl flex items-center justify-center transition-all shadow-sm active:scale-95',
+              inputText.trim().length > 0
+                ? 'bg-indigo-600 hover:bg-indigo-700 hover:shadow-md'
+                : 'bg-slate-300 cursor-not-allowed',
             )}
           >
             <Send size={15} className="ml-0.5" />
@@ -653,66 +501,92 @@ export default function AgentDrawer({ agentType }: AgentDrawerProps) {
         </div>
       </div>
 
-      {/* Configuration Overlay Panel */}
       <AnimatePresence>
         {isConfigOpen && (
           <motion.div
-             initial={{ y: '100%' }}
-             animate={{ y: 0 }}
-             exit={{ y: '100%' }}
-             transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-             className="absolute inset-0 z-50 bg-white flex flex-col shadow-2xl"
+            initial={{y: '100%'}}
+            animate={{y: 0}}
+            exit={{y: '100%'}}
+            transition={{type: 'spring', damping: 28, stiffness: 280}}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={configTitleId}
+            tabIndex={-1}
+            ref={dialogRef}
+            onKeyDown={handleConfigKeyDown}
+            className="absolute inset-0 z-50 bg-white flex flex-col shadow-2xl"
           >
-            {/* Settings Header */}
             <div className="px-5 py-4 border-b border-slate-200/60 flex items-center justify-between h-[4.5rem] bg-indigo-50/50 shrink-0">
-               <div className="flex items-center gap-2 text-indigo-900 font-bold text-[17px]">
-                 <Settings2 size={16} className="text-indigo-600" />
-                 多智能体团队配置
-               </div>
-               <button onClick={() => setIsConfigOpen(false)} className="p-1 px-2 hover:bg-slate-200/60 rounded-lg text-slate-500 transition-colors">
-                 <X size={18} />
-               </button>
+              <div id={configTitleId} className="flex items-center gap-2 text-indigo-900 font-bold text-[17px]">
+                <Settings2 size={16} className="text-indigo-600" />
+                协同配置
+              </div>
+              <button
+                type="button"
+                aria-label="关闭协同配置"
+                onClick={() => setIsConfigOpen(false)}
+                ref={closeConfigButtonRef}
+                className="p-1 px-2 hover:bg-slate-200/60 rounded-lg text-slate-500 transition-colors"
+              >
+                <X size={18} />
+              </button>
             </div>
-            
-            <div className="flex-1 overflow-y-auto p-5 custom-scrollbar bg-slate-50/30">
-              <h4 className="text-[15px] font-bold text-slate-800 mb-5 pb-2 border-b border-slate-100/60">团队提示词与规则配置 ({activeAgents.length})</h4>
 
-              {/* Render inputs for all active agents */}
-              {activeAgents.map(t => {
-                 const conf = agentConfig[t];
-                 return (
-                    <div key={t} className="mb-6">
-                       <label className="text-[14px] font-bold text-slate-600 mb-2.5 flex items-center gap-2">
-                         <div className={cn("w-6 h-6 rounded flex items-center justify-center text-white", conf.color)}><conf.icon size={12}/></div>
-                         {conf.name} 身份规则
-                       </label>
-                       <textarea 
-                         className="w-full h-24 p-3.5 bg-white border border-slate-200 rounded-xl text-[14px] text-slate-700 leading-relaxed font-medium focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 transition-all resize-none custom-scrollbar shadow-sm"
-                         value={agentPrompts[t]}
-                         onChange={(e) => setAgentPrompts({...agentPrompts, [t]: e.target.value})}
-                       />
-                    </div>
-                 );
+            <div className="flex-1 overflow-y-auto p-5 custom-scrollbar bg-slate-50/30">
+              <h4 className="text-[15px] font-bold text-slate-800 mb-5 pb-2 border-b border-slate-100/60">
+                当前协同说明 (0)
+              </h4>
+
+              {activeAgents.map((agent) => {
+                const config = agentConfig[agent];
+                const promptId = `agent-prompt-${agent}`;
+
+                return (
+                  <div key={agent} className="mb-6">
+                    <label
+                      htmlFor={promptId}
+                      className="text-[14px] font-bold text-slate-600 mb-2.5 flex items-center gap-2"
+                    >
+                      <div className={cn('w-6 h-6 rounded flex items-center justify-center text-white', config.color)}>
+                        <config.icon size={12} />
+                      </div>
+                      {config.name} 协同说明
+                    </label>
+                    <textarea
+                      id={promptId}
+                      className="w-full h-24 p-3.5 bg-white border border-slate-200 rounded-xl text-[14px] text-slate-700 leading-relaxed font-medium focus:outline-none focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 transition-all resize-none custom-scrollbar shadow-sm"
+                      value={agentPrompts[agent]}
+                      onChange={(e) =>
+                        setAgentPrompts((prev) => ({
+                          ...prev,
+                          [agent]: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                );
               })}
 
               <div className="p-4 bg-indigo-50/60 border border-indigo-100 rounded-xl mt-8 shadow-sm">
-                 <div className="flex items-start gap-2.5">
-                   <div className="mt-0.5"><Sparkles size={14} className="text-indigo-500" /></div>
-                   <p className="text-[13px] text-indigo-800 leading-relaxed font-bold">
-                     你可以同时启用多个 Agent，他们会在后台并网计算。例如在处理混合冲突时，研判 Agent 识别ddl，策略 Agent 提供优先级建议，然后交给规划 Agent 输出重排指令。
-                   </p>
-                 </div>
+                <div className="flex items-start gap-2.5">
+                  <div className="mt-0.5">
+                    <Sparkles size={14} className="text-indigo-500" />
+                  </div>
+                  <p className="text-[13px] text-indigo-800 leading-relaxed font-bold">
+                    {assistantCopy.configFootnote}
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Config Footer Actions */}
             <div className="p-5 border-t border-slate-200/60 shrink-0 bg-white">
-               <button 
-                  onClick={() => setIsConfigOpen(false)}
-                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl transition-all shadow-md shadow-slate-200 active:scale-[0.98]"
-               >
-                 保存规则并应用至上下文
-               </button>
+              <button
+                type="button"
+                onClick={() => setIsConfigOpen(false)}
+                className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3.5 rounded-xl transition-all shadow-md shadow-slate-200 active:scale-[0.98]"
+              >
+                关闭当前协同配置
+              </button>
             </div>
           </motion.div>
         )}

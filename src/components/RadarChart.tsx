@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { motion } from 'motion/react';
+import { submissionContent } from '../content/submissionContent';
 
 interface RadarDimension {
   label: string;
@@ -24,6 +25,7 @@ export default function RadarChart({
   const radius = size / 2 - padding;
   const levels = 4;
   const count = dimensions.length;
+  const hasGap = dimensions.some((d) => d.target - d.current > 0);
 
   const points = useMemo(() => {
     return dimensions.map((_, i) => {
@@ -165,11 +167,17 @@ export default function RadarChart({
           <span className="w-3 h-3 rounded-sm bg-indigo-500/80" /> 当前能力
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-sm border border-indigo-300 border-dashed" /> 目标要求（南大软工）
+          <span className="w-3 h-3 rounded-sm border border-indigo-300 border-dashed" /> {submissionContent.profile.radarTargetLabel}
         </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-2 h-2 rounded-full bg-rose-500" /> 重点差距
-        </span>
+        {hasGap ? (
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-rose-500" /> 重点差距
+          </span>
+        ) : (
+          <span className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-slate-300" /> 暂无差距记录
+          </span>
+        )}
       </div>
     </div>
   );

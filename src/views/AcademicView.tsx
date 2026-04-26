@@ -10,16 +10,7 @@ import {
   Network,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
-import {
-  GPA_BY_SEMESTER,
-  CURRENT_GPA,
-  TARGET_GPA,
-  CREDIT_CATEGORIES,
-  ONGOING_COURSES,
-  KNOWLEDGE_NODES,
-  KNOWLEDGE_EDGES,
-  CREDIT_WARNINGS,
-} from '../data/academic';
+import { submissionContent } from '../content/submissionContent';
 
 const riskStyles = {
   low: 'bg-emerald-50 text-emerald-700 border-emerald-100',
@@ -36,13 +27,15 @@ const masteryColors = {
 };
 
 function GpaCard() {
+  const { gpaBySemester, currentGpa, targetGpa } = submissionContent.academic;
   const maxGpa = 4.0;
-  const maxValue = Math.max(...GPA_BY_SEMESTER.map((s) => s.value));
-  const minValue = Math.min(...GPA_BY_SEMESTER.map((s) => s.value));
+  const values = gpaBySemester.map((s) => s.value);
+  const maxValue = Math.max(...values);
+  const minValue = Math.min(...values);
 
   return (
     <div
-      data-pet-hint="当前 GPA 3.82，距离目标 3.90 还差 0.08，5 学期呈阶梯上升——继续保持！"
+      data-pet-hint="这里展示阶段成绩趋势与目标基线，用于说明图表结构和指标布局。"
       className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full hover:border-indigo-200 hover:shadow-md transition-all duration-300"
     >
       <div className="flex items-center gap-3 mb-4">
@@ -50,23 +43,21 @@ function GpaCard() {
           <TrendingUp size={18} />
         </div>
         <div>
-          <h3 className="font-bold text-slate-800 text-[17px]">实时 GPA 测算</h3>
-          <p className="text-[13px] text-slate-500 font-medium mt-0.5">
-            由 <span className="font-bold text-violet-600">gpa-early-warning</span> Skill 驱动
-          </p>
+          <h3 className="font-bold text-slate-800 text-[17px]">阶段 GPA 测算</h3>
+          <p className="text-[13px] text-slate-500 font-medium mt-0.5">当前暂无成绩数据返回</p>
         </div>
       </div>
 
       <div className="flex items-end gap-3 mb-5">
         <div className="text-[45px] font-bold text-slate-900 leading-none tracking-tight tabular-nums">
-          {CURRENT_GPA.toFixed(2)}
+          {currentGpa.toFixed(2)}
         </div>
         <div className="text-sm text-slate-500 font-semibold pb-1">/ {maxGpa.toFixed(1)}</div>
         <div className="ml-auto text-right">
-          <div className="text-[12px] text-slate-400 font-semibold uppercase tracking-wider">距目标 {TARGET_GPA.toFixed(1)}</div>
+          <div className="text-[12px] text-slate-400 font-semibold uppercase tracking-wider">距目标 {targetGpa.toFixed(1)}</div>
           <div className="text-[15px] font-bold text-indigo-600 flex items-center gap-1.5 justify-end tabular-nums">
             <Target size={12} />
-            +{(TARGET_GPA - CURRENT_GPA).toFixed(2)}
+            +{(targetGpa - currentGpa).toFixed(2)}
           </div>
         </div>
       </div>
@@ -87,11 +78,11 @@ function GpaCard() {
           return (
             <>
               <div className="flex items-end gap-2 h-32">
-                {GPA_BY_SEMESTER.map((s, i) => {
-                  const isLatest = i === GPA_BY_SEMESTER.length - 1;
-                  const heightRatio = Math.max(
-                    8,
-                    ((s.value - chartMin) / (chartMax - chartMin)) * 100,
+                 {gpaBySemester.map((s, i) => {
+                   const isLatest = i === gpaBySemester.length - 1;
+                   const heightRatio = Math.max(
+                     8,
+                     ((s.value - chartMin) / (chartMax - chartMin)) * 100,
                   );
                   return (
                     <div
@@ -120,9 +111,9 @@ function GpaCard() {
                 })}
               </div>
               <div className="flex gap-2 mt-2">
-                {GPA_BY_SEMESTER.map((s, i) => {
-                  const isLatest = i === GPA_BY_SEMESTER.length - 1;
-                  return (
+                 {gpaBySemester.map((s, i) => {
+                   const isLatest = i === gpaBySemester.length - 1;
+                   return (
                     <div
                       key={s.label}
                       className={cn(
@@ -144,14 +135,15 @@ function GpaCard() {
 }
 
 function CreditCard() {
-  const totalEarned = CREDIT_CATEGORIES.reduce((a, c) => a + c.earned, 0);
-  const totalRequired = CREDIT_CATEGORIES.reduce((a, c) => a + c.required, 0);
-  const ratio = totalEarned / totalRequired;
+  const { creditCategories } = submissionContent.academic;
+  const totalEarned = creditCategories.reduce((a, c) => a + c.earned, 0);
+  const totalRequired = creditCategories.reduce((a, c) => a + c.required, 0);
+  const ratio = totalRequired === 0 ? 0 : totalEarned / totalRequired;
   const circ = 2 * Math.PI * 36;
 
   return (
     <div
-      data-pet-hint="学分进度 65%：专业课差 12 学分、通识还差 6 学分，Agent 已经帮你标出要补的方向了。"
+      data-pet-hint="这里展示学分完成度与分类进度，用于说明培养方案类视图的布局。"
       className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full hover:border-emerald-200 hover:shadow-md transition-all duration-300"
     >
       <div className="flex items-center gap-3 mb-4">
@@ -160,7 +152,7 @@ function CreditCard() {
         </div>
         <div>
           <h3 className="font-bold text-slate-800 text-[17px]">毕业学分进度</h3>
-          <p className="text-[13px] text-slate-500 font-medium mt-0.5">培养方案对照</p>
+          <p className="text-[13px] text-slate-500 font-medium mt-0.5">当前暂无学分数据返回</p>
         </div>
       </div>
 
@@ -193,15 +185,15 @@ function CreditCard() {
             <span className="text-sm text-slate-400 font-bold">/ {totalRequired}</span>
           </div>
           <div className="text-[13px] text-slate-500 font-medium mt-1">
-            还差 <span className="text-indigo-600 font-bold">{totalRequired - totalEarned}</span> 学分
-          </div>
-        </div>
-      </div>
+             还差 <span className="text-indigo-600 font-bold">{Math.max(0, totalRequired - totalEarned)}</span> 学分
+           </div>
+         </div>
+       </div>
 
-      <div className="space-y-2.5 mt-auto">
-        {CREDIT_CATEGORIES.map((c) => {
-          const r = c.earned / c.required;
-          return (
+       <div className="space-y-2.5 mt-auto">
+         {creditCategories.map((c) => {
+           const r = c.required === 0 ? 0 : c.earned / c.required;
+           return (
             <div key={c.label}>
               <div className="flex items-center justify-between text-[13px] font-bold mb-1">
                 <span className="text-slate-700">{c.label}</span>
@@ -224,9 +216,10 @@ function CreditCard() {
 }
 
 function WarningCard() {
+  const { warnings } = submissionContent.academic;
   return (
     <div
-      data-pet-hint="学分预警：策略 Agent 建议下学期选《高级算法分析》+《科技史导论》两门，一次性补齐两个短板。"
+      data-pet-hint="这里展示预警与建议卡片，但当前仅使用中性说明文案。"
       className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 flex flex-col h-full hover:border-amber-200 hover:shadow-md transition-all duration-300"
     >
       <div className="flex items-center gap-3 mb-4">
@@ -235,12 +228,12 @@ function WarningCard() {
         </div>
         <div>
           <h3 className="font-bold text-slate-800 text-[17px]">学分预警与选课建议</h3>
-          <p className="text-[13px] text-slate-500 font-medium mt-0.5">由策略 Agent 主动巡检</p>
+          <p className="text-[13px] text-slate-500 font-medium mt-0.5">当前暂无风险与建议记录</p>
         </div>
       </div>
 
       <div className="space-y-3 flex-1">
-        {CREDIT_WARNINGS.map((w, i) => (
+         {warnings.map((w, i) => (
           <div
             key={i}
             className={cn(
@@ -273,24 +266,25 @@ function WarningCard() {
 
         <div className="mt-auto p-3.5 rounded-2xl bg-indigo-50 border border-indigo-100 flex gap-2.5 items-start">
           <Sparkles size={14} className="shrink-0 mt-0.5 text-indigo-600" />
-          <div>
-            <div className="text-[12px] font-bold text-indigo-700 uppercase tracking-widest mb-0.5">
-              Agent 建议
-            </div>
-            <div className="text-[14px] font-semibold leading-relaxed text-slate-800">
-              下学期建议选《高级算法分析》+《科技史导论》，同时补齐通识学分与考研冲刺短板。
-            </div>
-          </div>
-        </div>
+            <div>
+              <div className="text-[12px] font-bold text-indigo-700 uppercase tracking-widest mb-0.5">
+               说明建议
+              </div>
+               <div className="text-[14px] font-semibold leading-relaxed text-slate-800">
+                智能分析已就绪，当前等待后端输入后生成建议动作。
+               </div>
+             </div>
+           </div>
       </div>
     </div>
   );
 }
 
 function OngoingCoursesTable() {
+  const { ongoingCourses } = submissionContent.academic;
   return (
     <div
-      data-pet-hint="本学期 5 门课：机器学习是高风险（随堂测验偏低），建议先抓这门；操作系统和软工稳定输出。"
+      data-pet-hint="这里展示在修课程表格结构，当前暂无课程记录。"
       className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 hover:border-violet-200 hover:shadow-md transition-all duration-300"
     >
       <div className="flex items-center justify-between gap-3 mb-4">
@@ -300,15 +294,16 @@ function OngoingCoursesTable() {
           </div>
           <div>
             <h3 className="font-bold text-slate-800 text-[17px]">本学期在修课程</h3>
-            <p className="text-[13px] text-slate-500 font-medium mt-0.5">基于随堂成绩 + 出勤动态预测</p>
+            <p className="text-[13px] text-slate-500 font-medium mt-0.5">当前暂无课程、预测分与风险记录</p>
           </div>
         </div>
         <span className="text-[13px] font-semibold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
-          共 {ONGOING_COURSES.length} 门
+          共 {ongoingCourses.length} 门
         </span>
       </div>
 
       <div className="overflow-x-auto">
+        {ongoingCourses.length > 0 ? (
         <table className="w-full text-[14px]">
           <thead>
             <tr className="text-[12px] font-bold text-slate-400 uppercase tracking-wider">
@@ -321,7 +316,7 @@ function OngoingCoursesTable() {
             </tr>
           </thead>
           <tbody>
-            {ONGOING_COURSES.map((c) => (
+            {ongoingCourses.map((c) => (
               <tr
                 key={c.id}
                 className="border-t border-slate-100 hover:bg-slate-50/60 transition-colors"
@@ -363,12 +358,18 @@ function OngoingCoursesTable() {
             ))}
           </tbody>
         </table>
+        ) : (
+          <div className="rounded-2xl border border-slate-100 bg-slate-50 px-4 py-8 text-center text-[14px] font-medium text-slate-500">
+            当前暂无课程记录，预测分、学分与风险状态待同步。
+          </div>
+        )}
       </div>
     </div>
   );
 }
 
 function KnowledgeTopology() {
+  const { knowledgeNodes, knowledgeEdges } = submissionContent.academic;
   const cols = 6;
   const rows = 4;
   const colGap = 165;
@@ -381,7 +382,7 @@ function KnowledgeTopology() {
   const nodeHalfHeight = 20;
 
   const nodeMap = Object.fromEntries(
-    KNOWLEDGE_NODES.map((n) => [
+    knowledgeNodes.map((n) => [
       n.id,
       { ...n, px: padX + n.x * colGap, py: padY + n.y * rowGap },
     ]),
@@ -389,7 +390,7 @@ function KnowledgeTopology() {
 
   return (
     <div
-      data-pet-hint="知识点依赖图：绿节点已掌握，黄节点在学，灰节点未开始。从离散数学延伸到机器学习、分布式系统，是完整的计算机学习路径。"
+      data-pet-hint="这里展示知识点依赖图，用于说明节点、连线和阶段状态的表达方式。"
       className="bg-white rounded-3xl border border-slate-200 shadow-sm p-5 md:p-6 hover:border-indigo-200 hover:shadow-md transition-all duration-300"
     >
       <div className="flex items-center justify-between gap-3 mb-4">
@@ -400,22 +401,22 @@ function KnowledgeTopology() {
           <div>
             <h3 className="font-bold text-slate-800 text-[17px]">专业知识点拓扑图</h3>
             <p className="text-[13px] text-slate-500 font-medium mt-0.5">
-              展示核心课程的依赖关系与掌握进度
-            </p>
-          </div>
-        </div>
+               展示核心能力依赖关系与当前状态
+             </p>
+           </div>
+         </div>
         <div className="flex gap-3 text-[12px] font-bold text-slate-500">
           <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> 已掌握
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> 在学
-          </span>
-          <span className="flex items-center gap-1.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-slate-300" /> 未开始
-          </span>
-        </div>
-      </div>
+             <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> 已同步
+           </span>
+           <span className="flex items-center gap-1.5">
+             <span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> 待分析
+           </span>
+           <span className="flex items-center gap-1.5">
+             <span className="w-2.5 h-2.5 rounded-full bg-slate-300" /> 暂无记录
+           </span>
+         </div>
+       </div>
 
       <div className="w-full flex justify-center">
         <svg
@@ -439,7 +440,7 @@ function KnowledgeTopology() {
             </marker>
           </defs>
 
-          {KNOWLEDGE_EDGES.map((e, i) => {
+           {knowledgeEdges.map((e, i) => {
             const a = nodeMap[e.from];
             const b = nodeMap[e.to];
             if (!a || !b) return null;
@@ -457,7 +458,7 @@ function KnowledgeTopology() {
             );
           })}
 
-          {KNOWLEDGE_NODES.map((n) => {
+           {knowledgeNodes.map((n) => {
             const pos = nodeMap[n.id];
             const c = masteryColors[n.mastery];
             return (
@@ -507,11 +508,11 @@ export default function AcademicView() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">学业规划</h1>
           <p className="text-xs text-slate-500 font-medium mt-1">
-            GPA 动态测算 · 学分进度追踪 · 知识点依赖拓扑
+            {submissionContent.academic.headerSubtitle}
           </p>
         </div>
         <span className="text-[13px] font-semibold text-slate-500 bg-white border border-slate-200 px-3 py-1.5 rounded-full shadow-sm">
-          数据同步：10 分钟前（教务接口）
+          {submissionContent.academic.syncLabel}
         </span>
       </motion.header>
 

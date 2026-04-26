@@ -8,6 +8,7 @@ import {
   FileOutput,
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { submissionContent } from '../content/submissionContent';
 
 type Role = 'master' | 'judgment' | 'planning' | 'policy' | 'output';
 
@@ -30,55 +31,14 @@ const roleStyles: Record<
   output: { color: 'bg-indigo-600 text-white', icon: FileOutput, name: '输出' },
 };
 
-const STAGES: {
+const STAGES = submissionContent.workflow.stages as {
   stage: 'intake' | 'parallel' | 'converge' | 'output';
   nodes: Node[];
-}[] = [
-  {
-    stage: 'intake',
-    nodes: [
-      {
-        id: 'master-plan',
-        role: 'master',
-        label: '意图拆解 & Plan 生成',
-        detail: '识别目标 / 约束 / 时间范围 / 关键对象',
-        status: 'done',
-      },
-    ],
-  },
-  {
-    stage: 'parallel',
-    nodes: [
-      { id: 'judgment', role: 'judgment', label: '信息研判', detail: '事件性质 · 重要度 · 来源可信度', status: 'done' },
-      { id: 'planning', role: 'planning', label: '日程规划', detail: '拆解 · 排期 · 冲突检测', status: 'active' },
-      { id: 'policy', role: 'policy', label: '策略支持', detail: '结合长期目标做优先级与取舍', status: 'active' },
-    ],
-  },
-  {
-    stage: 'converge',
-    nodes: [
-      {
-        id: 'master-merge',
-        role: 'master',
-        label: '冲突检测 & 加权裁决',
-        detail: '比对子结论一致性，依目标优先级出裁定',
-        status: 'pending',
-      },
-    ],
-  },
-  {
-    stage: 'output',
-    nodes: [
-      {
-        id: 'output',
-        role: 'output',
-        label: '结构化输出',
-        detail: '推荐方案 + 理由说明 + 可选替代路径',
-        status: 'pending',
-      },
-    ],
-  },
-];
+}[];
+
+function getStage(stageName: 'intake' | 'parallel' | 'converge' | 'output') {
+  return STAGES.find((stage) => stage.stage === stageName);
+}
 
 function StatusDot({ status }: { status: Node['status'] }) {
   if (status === 'done') return <CheckCircle2 size={12} className="text-emerald-500 shrink-0" />;
@@ -133,7 +93,7 @@ function CompactNode({ node }: { node: Node }) {
       <div className={cn('rounded-md flex items-center justify-center shrink-0 w-5 h-5', s.color)}>
         <Icon size={10} />
       </div>
-      <span className="text-[12px] font-semibold text-slate-700 truncate">{s.name}</span>
+      <span className="text-[12px] font-semibold text-slate-700 truncate">{node.label}</span>
       <StatusDot status={node.status} />
     </motion.div>
   );
@@ -153,10 +113,24 @@ interface WorkflowVisualizerProps {
 }
 
 export default function WorkflowVisualizer({
-  title = '多智能体协同流水线',
-  hint = '多智能体协同工作流：意图拆解 → 子 Agent 并行 → 主控裁决 → 结构化输出',
+  title = submissionContent.workflow.title,
+  hint = submissionContent.workflow.hint,
   compact = false,
 }: WorkflowVisualizerProps) {
+  const intakeStage = getStage('intake');
+  const parallelStage = getStage('parallel');
+  const convergeStage = getStage('converge');
+  const outputStage = getStage('output');
+
+  const compactTopNodes = [
+    ...(intakeStage?.nodes ?? []),
+    ...(parallelStage?.nodes ?? []),
+  ];
+  const compactBottomNodes = [
+    ...(convergeStage?.nodes ?? []),
+    ...(outputStage?.nodes ?? []),
+  ];
+
   return (
     <div className="w-full">
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -174,30 +148,38 @@ export default function WorkflowVisualizer({
           </div>
         </div>
         <span className="shrink-0 text-[11px] font-semibold text-indigo-600 bg-indigo-50 border border-indigo-100 px-1.5 py-0.5 rounded uppercase tracking-widest">
-          Agent Flow
+          Submission Flow
         </span>
       </div>
 
+      {!compact && (
+        <div className="mb-3 flex items-center gap-2 flex-wrap text-[12px] font-semibold text-slate-500">
+          <span className="px-2 py-1 rounded-full bg-slate-100 border border-slate-200">0 条输入数据</span>
+          <span className="px-2 py-1 rounded-full bg-slate-100 border border-slate-200">暂无交互记录</span>
+        </div>
+      )}
+
       {compact ? (
-        /* 2-row horizontal flow fits inside narrow cards */
         <div className="space-y-2">
-          <div className="flex items-stretch gap-1">
-            <div className="flex-1"><CompactNode node={STAGES[0].nodes[0]} /></div>
-            <div className="flex items-center"><Connector compact /></div>
-            <div className="flex-[2] grid grid-cols-3 gap-1">
-              {STAGES[1].nodes.map((n) => (
-                <div key={n.id}>
-                  <CompactNode node={n} />
+          {compactTopNodes.length > 0 && (
+            <div className={cn('grid gap-1', compactTopNodes.length === 1 ? 'grid-cols-1' : `grid-cols-${Math.min(compactTopNodes.length, 4)}`)} style={{gridTemplateColumns: `repeat(${compactTopNodes.length}, minmax(0, 1fr))`}}>
+              {compactTopNodes.map((node) => (
+                <div key={node.id}>
+                  <CompactNode node={node} />
                 </div>
               ))}
             </div>
-          </div>
-          <Connector compact vertical />
-          <div className="flex items-stretch gap-1">
-            <div className="flex-1"><CompactNode node={STAGES[2].nodes[0]} /></div>
-            <div className="flex items-center"><Connector compact /></div>
-            <div className="flex-1"><CompactNode node={STAGES[3].nodes[0]} /></div>
-          </div>
+          )}
+          {compactTopNodes.length > 0 && compactBottomNodes.length > 0 && <Connector compact vertical />}
+          {compactBottomNodes.length > 0 && (
+            <div className={cn('grid gap-1', compactBottomNodes.length === 1 ? 'grid-cols-1' : `grid-cols-${Math.min(compactBottomNodes.length, 4)}`)} style={{gridTemplateColumns: `repeat(${compactBottomNodes.length}, minmax(0, 1fr))`}}>
+              {compactBottomNodes.map((node) => (
+                <div key={node.id}>
+                  <CompactNode node={node} />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       ) : (
         /* Unified 3-column grid: single-node stages sit in center column; parallel stage fills all 3 */
